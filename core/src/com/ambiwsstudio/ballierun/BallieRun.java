@@ -28,6 +28,7 @@ public class BallieRun extends ApplicationAdapter {
     private int pointerYCurrent = 0;
     private int pointerDiffX = 0;
     private int pointerDiffY = 0;
+    final private int maxVelocity = 10;
     private boolean isTouchedOnce = false;
     private boolean isInjectedForce = true;
 
@@ -72,12 +73,27 @@ public class BallieRun extends ApplicationAdapter {
                 pointerDiffX = pointerXLast - pointerXCurrent;
                 pointerDiffY = pointerYLast - pointerYCurrent;
 
+                velocityMultiplier = velocityMultiplierConstant;
+
                 if (pointerDiffY < 0) {
 
                     isBallFlyingUp = true;
                     gravityConstant = -1;
                     velocity = (-pointerDiffY * 1.0 / velocityForceDivider);
-                    velocityMultiplier = velocityMultiplierConstant;
+
+                }
+
+                if (pointerDiffY > 0) {
+
+                    isBallFlyingUp = false;
+                    gravityConstant = 1;
+                    velocity = velocity + (pointerDiffY * 1.0 / velocityForceDivider);
+
+                }
+
+                if (velocity > maxVelocity) {
+
+                    velocity = maxVelocity;
 
                 }
 
@@ -100,6 +116,8 @@ public class BallieRun extends ApplicationAdapter {
     private void renderBall(SpriteBatch batch) {
 
         batch.draw(ball, ballSize, (int) ballPositionY, ballSize, ballSize);
+
+        System.out.println(velocity);
 
         if (!isBallFlyingUp) {
 
@@ -138,6 +156,14 @@ public class BallieRun extends ApplicationAdapter {
 
             }
 
+        }
+
+        if (ballPositionY > Gdx.graphics.getHeight() - ballSize) {
+
+            ballPositionY = Gdx.graphics.getHeight() - ballSize;
+            gravityConstant = 1;
+            isBallFlyingUp = false;
+            velocity = velocity * (1.0 - velocityDivider);
 
         }
 
