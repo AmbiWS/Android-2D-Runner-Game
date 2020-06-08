@@ -13,6 +13,7 @@ public class BallieRun extends ApplicationAdapter {
     private int tileSize = 256;
     private int ballSize = 128;
     private double ballPositionY = (tileSize * 1.0) + (ballSize * 5);
+    private double ballPositionX = ballSize;
 
     final private double gravity = 9.8;
     private double velocity = 0;
@@ -21,6 +22,12 @@ public class BallieRun extends ApplicationAdapter {
     private double velocityDivider = 0.3;
     private int velocityForceDivider = 75;
     private int gravityConstant = 1;
+
+    private double velocityX = 0;
+    private double velocityXMultiplier = 0.01;
+    private final double velocityXMultiplierConstant = 0.01;
+    private int gravityConstantX = 0;
+    private int velocityXForceDivider = 75;
 
     private int pointerXLast = 0;
     private int pointerYLast = 0;
@@ -34,7 +41,8 @@ public class BallieRun extends ApplicationAdapter {
 
     private Texture ball;
 
-    private boolean isBallFlyingUp = false;
+    private boolean isBallForceUp = false;
+    private boolean isBallForceSide = false;
 
     @Override
     public void create() {
@@ -77,7 +85,7 @@ public class BallieRun extends ApplicationAdapter {
 
                 if (pointerDiffY < 0) {
 
-                    isBallFlyingUp = true;
+                    isBallForceUp = true;
                     gravityConstant = -1;
                     velocity = (-pointerDiffY * 1.0 / velocityForceDivider);
 
@@ -85,15 +93,41 @@ public class BallieRun extends ApplicationAdapter {
 
                 if (pointerDiffY > 0) {
 
-                    isBallFlyingUp = false;
+                    isBallForceUp = false;
                     gravityConstant = 1;
                     velocity = velocity + (pointerDiffY * 1.0 / velocityForceDivider);
+
+                }
+
+                if (pointerDiffX > 0) {
+
+                    //velocityX = velocityX + (pointerDiffX * 1.0 / velocityXForceDivider);
+                    velocityX = (pointerDiffX * 1.0 / velocityXForceDivider);
+                    gravityConstantX = 1;
+                    velocityXMultiplier = velocityXMultiplierConstant;
+                    isBallForceSide = true;
+
+                }
+
+                if (pointerDiffX < 0) {
+
+                    //velocityX = velocityX + (-pointerDiffX * 1.0 / velocityXForceDivider);
+                    velocityX = (-pointerDiffX * 1.0 / velocityXForceDivider);
+                    gravityConstantX = -1;
+                    velocityXMultiplier = velocityXMultiplierConstant;
+                    isBallForceSide = true;
 
                 }
 
                 if (velocity > maxVelocity) {
 
                     velocity = maxVelocity;
+
+                }
+
+                if (velocityX > maxVelocity) {
+
+                    velocityX = maxVelocity;
 
                 }
 
@@ -115,11 +149,52 @@ public class BallieRun extends ApplicationAdapter {
 
     private void renderBall(SpriteBatch batch) {
 
-        batch.draw(ball, ballSize, (int) ballPositionY, ballSize, ballSize);
+        batch.draw(ball, (int) ballPositionX, (int) ballPositionY, ballSize, ballSize);
 
-        System.out.println(velocity);
+        System.out.println(velocityX);
 
-        if (!isBallFlyingUp) {
+        if (isBallForceSide) {
+
+            if (velocity == 0) {
+
+                velocityXMultiplier = 0.03;
+
+            } else {
+
+                velocityXMultiplier = velocityXMultiplierConstant;
+
+            }
+
+            ballPositionX += (gravity * velocityX * gravityConstantX);
+            velocityX -= velocityXMultiplier;
+
+            if (velocityX < 0) {
+
+                isBallForceSide = false;
+                velocityX = 0;
+                velocityXMultiplier = 0;
+                gravityConstantX = 0;
+
+            }
+
+        }
+
+        if (ballPositionX > Gdx.graphics.getWidth() - ballSize) {
+
+            ballPositionX = Gdx.graphics.getWidth() - ballSize;
+            gravityConstantX = -1;
+
+        }
+
+        if (ballPositionX < 0) {
+
+            ballPositionX = 0;
+            gravityConstantX = 1;
+
+        }
+
+
+        if (!isBallForceUp) {
 
             ballPositionY -= (gravity * velocity * gravityConstant);
             velocity += velocityMultiplier;
@@ -131,7 +206,7 @@ public class BallieRun extends ApplicationAdapter {
 
             if (velocity < 0) {
 
-                isBallFlyingUp = false;
+                isBallForceUp = false;
                 gravityConstant = 1;
 
             }
@@ -140,18 +215,21 @@ public class BallieRun extends ApplicationAdapter {
 
         if (ballPositionY < tileSize) {
 
+            if (velocityX < 0.5)
+                velocityX = 0.5;
+
             ballPositionY = tileSize;
             gravityConstant = -1;
 
-            if (velocity < 1) {
+            if (velocity < 1.1) {
 
-                isBallFlyingUp = false;
+                isBallForceUp = false;
                 velocity = 0;
                 velocityMultiplier = 0;
 
             } else {
 
-                isBallFlyingUp = true;
+                isBallForceUp = true;
                 velocity = velocity * (1.0 - velocityDivider);
 
             }
@@ -162,7 +240,7 @@ public class BallieRun extends ApplicationAdapter {
 
             ballPositionY = Gdx.graphics.getHeight() - ballSize;
             gravityConstant = 1;
-            isBallFlyingUp = false;
+            isBallForceUp = false;
             velocity = velocity * (1.0 - velocityDivider);
 
         }
