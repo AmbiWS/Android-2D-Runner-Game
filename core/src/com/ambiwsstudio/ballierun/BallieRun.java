@@ -17,8 +17,19 @@ public class BallieRun extends ApplicationAdapter {
     final private double gravity = 9.8;
     private double velocity = 0;
     private double velocityMultiplier = 0.14;
+    private final double velocityMultiplierConstant = 0.14;
     private double velocityDivider = 0.3;
+    private int velocityForceDivider = 75;
     private int gravityConstant = 1;
+
+    private int pointerXLast = 0;
+    private int pointerYLast = 0;
+    private int pointerXCurrent = 0;
+    private int pointerYCurrent = 0;
+    private int pointerDiffX = 0;
+    private int pointerDiffY = 0;
+    private boolean isTouchedOnce = false;
+    private boolean isInjectedForce = true;
 
     private Texture ball;
 
@@ -32,7 +43,47 @@ public class BallieRun extends ApplicationAdapter {
         ball = new Texture("ball.png");
     }
 
+
     private void renderEnvironment(SpriteBatch batch) {
+
+        if (Gdx.input.isTouched()) {
+
+            if (!isTouchedOnce) {
+
+                isInjectedForce = false;
+                pointerXLast = Gdx.input.getX();
+                pointerYLast = Gdx.input.getY();
+
+            }
+
+            isTouchedOnce = true;
+
+        } else {
+
+            isTouchedOnce = false;
+
+            if (!isInjectedForce) {
+
+                isInjectedForce = true;
+
+                pointerXCurrent = Gdx.input.getX();
+                pointerYCurrent = Gdx.input.getY();
+
+                pointerDiffX = pointerXLast - pointerXCurrent;
+                pointerDiffY = pointerYLast - pointerYCurrent;
+
+                if (pointerDiffY < 0) {
+
+                    isBallFlyingUp = true;
+                    gravityConstant = -1;
+                    velocity = (-pointerDiffY * 1.0 / velocityForceDivider);
+                    velocityMultiplier = velocityMultiplierConstant;
+
+                }
+
+            }
+
+        }
 
         batch.draw(background, 0, 0);
 
@@ -73,8 +124,6 @@ public class BallieRun extends ApplicationAdapter {
 
             ballPositionY = tileSize;
             gravityConstant = -1;
-
-            System.out.println(velocity);
 
             if (velocity < 1) {
 
