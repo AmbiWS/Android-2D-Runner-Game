@@ -2,7 +2,6 @@ package com.ambiwsstudio.ballierun;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -18,12 +17,11 @@ public class BallieRun extends ApplicationAdapter {
     final private double gravity = 9.8;
     private double velocity = 0;
     private double velocityMultiplier = 0.14;
-    private double velocityDivider = 0.2;
+    private double velocityDivider = 0.3;
     private int gravityConstant = 1;
 
     private Texture ball;
 
-    private boolean isBallOnGround = false;
     private boolean isBallFlyingUp = false;
 
     @Override
@@ -73,10 +71,24 @@ public class BallieRun extends ApplicationAdapter {
 
         if (ballPositionY < tileSize) {
 
-            isBallFlyingUp = true;
             ballPositionY = tileSize;
-            velocity = velocity * (1.0 - velocityDivider);
             gravityConstant = -1;
+
+            System.out.println(velocity);
+
+            if (velocity < 1) {
+
+                isBallFlyingUp = false;
+                velocity = 0;
+                velocityMultiplier = 0;
+
+            } else {
+
+                isBallFlyingUp = true;
+                velocity = velocity * (1.0 - velocityDivider);
+
+            }
+
 
         }
 
