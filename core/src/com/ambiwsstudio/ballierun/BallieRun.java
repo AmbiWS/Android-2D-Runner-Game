@@ -57,6 +57,11 @@ public class BallieRun extends ApplicationAdapter {
     private int vineHWidth = 320;
     private int vineHHeight = 160;
 
+    private Texture gameOver;
+    private int gameOverHeight = 600;
+    private int gameOverWidth = 1000;
+    private static int gameMode = 1;
+
     @Override
     public void create() {
         batch = new SpriteBatch();
@@ -66,6 +71,7 @@ public class BallieRun extends ApplicationAdapter {
         vineHorizontal = new Texture("vineh.png");
         vineVertical = new Texture("vinev.png");
         vineVerticalReversed = new Texture("vinevr.png");
+        gameOver = new Texture("gameover.png");
 
         ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int)(ballSize * 1.0 / 2);
     }
@@ -184,7 +190,9 @@ public class BallieRun extends ApplicationAdapter {
         do {
 
             batch.draw(defaultTile, (int) (i * tileSize - drawableX), 0, tileSize, tileSize);
-            drawableX += speed;
+
+            if (gameMode == 1)
+                drawableX += speed;
 
             if (velocity == 0) {
 
@@ -202,11 +210,23 @@ public class BallieRun extends ApplicationAdapter {
 
         } while (i * tileSize - tileSize < Gdx.graphics.getWidth());
 
+        if (gameMode == 0) {
+
+            int gameOverDrawingX = (int)((Gdx.graphics.getWidth() * 1.0 / 2) - gameOverWidth / 2);
+            int gameOverDrawingY = (int)((Gdx.graphics.getHeight() * 1.0 / 2) - gameOverHeight / 2);
+
+            batch.draw(gameOver, gameOverDrawingX, gameOverDrawingY, gameOverWidth, gameOverHeight);
+
+
+
+        }
+
     }
 
     private void renderBall(SpriteBatch batch) {
 
-        batch.draw(ball, (int) ballPositionX, (int) ballPositionY, ballSize, ballSize);
+        if (gameMode == 1)
+            batch.draw(ball, (int) ballPositionX, (int) ballPositionY, ballSize, ballSize);
 
         if (isBallForceSide) {
 
@@ -294,6 +314,14 @@ public class BallieRun extends ApplicationAdapter {
             gravityConstant = 1;
             isBallForceUp = false;
             velocity = velocity * (1.0 - velocityDivider);
+
+        }
+
+        if (ballPositionX < 48
+                || (ballPositionX + ballSize > Gdx.graphics.getWidth() - 48)
+                || (ballPositionY + ballSize > Gdx.graphics.getHeight() - 16)) {
+
+            gameMode = 0;
 
         }
 
