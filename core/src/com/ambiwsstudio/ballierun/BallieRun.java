@@ -2,8 +2,10 @@ package com.ambiwsstudio.ballierun;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class BallieRun extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -40,10 +42,12 @@ public class BallieRun extends ApplicationAdapter {
     private boolean isInjectedForce = true;
 
     private Texture ball;
-    private Texture ball2;
 
     private boolean isBallForceUp = false;
     private boolean isBallForceSide = false;
+
+    private double drawableX = 0;
+    private double speed = 0.2;
 
     @Override
     public void create() {
@@ -51,7 +55,6 @@ public class BallieRun extends ApplicationAdapter {
         background = new Texture("Background.png");
         defaultTile = new Texture("Tile_2.png");
         ball = new Texture("ball.png");
-        ball2 = new Texture("ball2.png");
     }
 
 
@@ -144,25 +147,36 @@ public class BallieRun extends ApplicationAdapter {
 
         batch.draw(background, 0, 0);
 
+        if (drawableX >= tileSize)
+            drawableX = 0;
+
         int i = 0;
         do {
 
-            batch.draw(defaultTile, i * tileSize, 0, tileSize, tileSize);
+            batch.draw(defaultTile, (int) (i * tileSize - drawableX), 0, tileSize, tileSize);
+            drawableX += speed;
+
+            if (velocity == 0) {
+
+                if (velocityX <= 0.02) {
+
+                    gravityConstantX = 1;
+                    velocityX = 0.02;
+                    ballPositionX -= (gravity * velocityX * gravityConstantX);
+
+                }
+
+            }
+
             i++;
 
-        } while (i * tileSize < Gdx.graphics.getWidth());
+        } while (i * tileSize - tileSize < Gdx.graphics.getWidth());
 
     }
 
     private void renderBall(SpriteBatch batch) {
 
         batch.draw(ball, (int) ballPositionX, (int) ballPositionY, ballSize, ballSize);
-
-        if (Gdx.input.isTouched()) {
-
-            batch.draw(ball2, (int)(pointerXLast - (ballSize * 1.0 / 2)), (int)(Math.abs(Gdx.graphics.getHeight() - pointerYLast) - (ballSize * 1.0 / 2)), ballSize, ballSize);
-
-        }
 
         if (isBallForceSide) {
 
@@ -225,9 +239,6 @@ public class BallieRun extends ApplicationAdapter {
         }
 
         if (ballPositionY < (tileSize * 1.0 / 2)) {
-
-            if (velocityX < 0.3)
-                velocityX = 0.3;
 
             ballPositionY = (tileSize * 1.0 / 2);
             gravityConstant = -1;
