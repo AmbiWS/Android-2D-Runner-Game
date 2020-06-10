@@ -15,7 +15,7 @@ public class BallieRun extends ApplicationAdapter {
     private int tileSize = 256;
     private int ballSize = 128;
     private double ballPositionY = (tileSize * 1.0) + (ballSize * 5);
-    private double ballPositionX = ballSize;
+    private double ballPositionX = 0;
 
     final private double gravity = 9.8;
     private double velocity = 0;
@@ -42,6 +42,9 @@ public class BallieRun extends ApplicationAdapter {
     private boolean isInjectedForce = true;
 
     private Texture ball;
+    private Texture vineHorizontal;
+    private Texture vineVertical;
+    private Texture vineVerticalReversed;
 
     private boolean isBallForceUp = false;
     private boolean isBallForceSide = false;
@@ -49,14 +52,23 @@ public class BallieRun extends ApplicationAdapter {
     private double drawableX = 0;
     private double speed = 0.2;
 
+    private int vineWidth = 160;
+    private int vineHeight = 320;
+    private int vineHWidth = 320;
+    private int vineHHeight = 160;
+
     @Override
     public void create() {
         batch = new SpriteBatch();
         background = new Texture("Background.png");
         defaultTile = new Texture("Tile_2.png");
         ball = new Texture("ball.png");
-    }
+        vineHorizontal = new Texture("vineh.png");
+        vineVertical = new Texture("vinev.png");
+        vineVerticalReversed = new Texture("vinevr.png");
 
+        ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int)(ballSize * 1.0 / 2);
+    }
 
     private void renderEnvironment(SpriteBatch batch) {
 
@@ -146,6 +158,24 @@ public class BallieRun extends ApplicationAdapter {
         }
 
         batch.draw(background, 0, 0);
+
+        int vineHorI = 0;
+        do {
+
+            batch.draw(vineHorizontal, vineHorI, Gdx.graphics.getHeight() - (int)(vineHHeight * 1.0 / 2) + 5, vineHWidth, vineHHeight);
+            vineHorI += vineHWidth - 20;
+
+        } while (vineHorI < Gdx.graphics.getWidth());
+
+        int vineI = 0;
+        do {
+
+            batch.draw(vineVertical, 0 - (int)(vineWidth * 1.0 / 3) - 10, vineI, vineWidth, vineHeight);
+            batch.draw(vineVerticalReversed, Gdx.graphics.getWidth() - (int)(vineWidth * 1.0 / 2) - 15, vineI, vineWidth, vineHeight);
+            vineI += vineHeight - 30;
+
+        } while (vineI < Gdx.graphics.getHeight());
+
 
         if (drawableX >= tileSize)
             drawableX = 0;
@@ -284,6 +314,7 @@ public class BallieRun extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
+        ball.dispose();
         background.dispose();
     }
 }
