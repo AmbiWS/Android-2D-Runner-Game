@@ -2,34 +2,80 @@ package com.ambiwsstudio.ballierun;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class BallieRun extends ApplicationAdapter {
-    private SpriteBatch batch;
 
+    /*
+        Gdx variables
+     */
+
+    private SpriteBatch batch;
     private Texture background;
     private Texture defaultTile;
+    private Texture ball;
+    private Texture vineHorizontal;
+    private Texture vineVertical;
+    private Texture vineVerticalReversed;
+    private Texture gameOver;
+
+    /*
+        Sizes & Points
+     */
+
     private int tileSize = 256;
     private int ballSize = 128;
     private double ballPositionY = (tileSize * 1.0) + (ballSize * 5);
-    private double ballPositionX = 0;
+    private double ballPositionX;
 
-    final private double gravity = 9.8;
+    private int vineWidth = 160;
+    private int vineHeight = 320;
+    private int vineHWidth = 320;
+    private int vineHHeight = 160;
+
+    private int gameOverHeight = 600;
+    private int gameOverWidth = 1000;
+    private int gameOverDrawingX;
+    private int gameOverDrawingY;
+
+    private final int buttonWidth = 500;
+    private final int buttonHeight = 60;
+
+    private final int restartButtonXFromGameOver = 250;
+    private final int restartButtonYFromGameOver = 300;
+
+    private final int menuButtonXFromGameOver = 250;
+    private final int menuButtonYFromGameOver = 390;
+
+    private final int quitButtonXFromGameOver = 250;
+    private final int quitButtonYFromGameOver = 480;
+
+    /*
+        Game variables (Physics & States)
+     */
+
+    private final double gravity = 9.8;
+    private final double velocityMultiplierConstant = 0.14;
+    private final double velocityDivider = 0.3;
+    private final double velocityXMultiplierConstant = 0.01;
+    private final int velocityXForceDivider = 75;
+    private final int velocityForceDivider = 75;
+    final private int maxVelocity = 10;
     private double velocity = 0;
     private double velocityMultiplier = 0.14;
-    private final double velocityMultiplierConstant = 0.14;
-    private double velocityDivider = 0.3;
-    private int velocityForceDivider = 75;
     private int gravityConstant = 1;
-
     private double velocityX = 0;
     private double velocityXMultiplier = 0.01;
-    private final double velocityXMultiplierConstant = 0.01;
     private int gravityConstantX = 0;
-    private int velocityXForceDivider = 75;
+    private double drawableX = 0;
+    private double speed = 0.2;
+    private int gameMode = 1;
+
+    /*
+        User-input variables & Booleans
+     */
 
     private int pointerXLast = 0;
     private int pointerYLast = 0;
@@ -37,30 +83,25 @@ public class BallieRun extends ApplicationAdapter {
     private int pointerYCurrent = 0;
     private int pointerDiffX = 0;
     private int pointerDiffY = 0;
-    final private int maxVelocity = 10;
+
     private boolean isTouchedOnce = false;
     private boolean isInjectedForce = true;
-
-    private Texture ball;
-    private Texture vineHorizontal;
-    private Texture vineVertical;
-    private Texture vineVerticalReversed;
-
     private boolean isBallForceUp = false;
     private boolean isBallForceSide = false;
 
-    private double drawableX = 0;
-    private double speed = 0.2;
+    private void resetGameVariables() {
 
-    private int vineWidth = 160;
-    private int vineHeight = 320;
-    private int vineHWidth = 320;
-    private int vineHHeight = 160;
+        ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int)(ballSize * 1.0 / 2);
+        ballPositionY = (tileSize * 1.0) + (ballSize * 5);
 
-    private Texture gameOver;
-    private int gameOverHeight = 600;
-    private int gameOverWidth = 1000;
-    private static int gameMode = 1;
+        velocity = 0;
+        velocityMultiplier = velocityMultiplierConstant;
+        gravityConstant = 1;
+        velocityX = 0;
+        velocityXMultiplier = velocityXMultiplierConstant;
+        gravityConstantX = 0;
+
+    }
 
     @Override
     public void create() {
@@ -74,6 +115,8 @@ public class BallieRun extends ApplicationAdapter {
         gameOver = new Texture("gameover.png");
 
         ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int)(ballSize * 1.0 / 2);
+        gameOverDrawingX = (int) ((Gdx.graphics.getWidth() * 1.0 / 2) - gameOverWidth / 2);
+        gameOverDrawingY = (int) ((Gdx.graphics.getHeight() * 1.0 / 2) - gameOverHeight / 2);
     }
 
     private void renderEnvironment(SpriteBatch batch) {
@@ -212,14 +255,72 @@ public class BallieRun extends ApplicationAdapter {
 
         if (gameMode == 0) {
 
-            int gameOverDrawingX = (int)((Gdx.graphics.getWidth() * 1.0 / 2) - gameOverWidth / 2);
-            int gameOverDrawingY = (int)((Gdx.graphics.getHeight() * 1.0 / 2) - gameOverHeight / 2);
-
             batch.draw(gameOver, gameOverDrawingX, gameOverDrawingY, gameOverWidth, gameOverHeight);
 
+        }
 
+        if (Gdx.input.justTouched()) {
+
+            if (gameMode == 0) {
+
+                if (isBtnClicked(restartButtonXFromGameOver, restartButtonYFromGameOver)) {
+
+                    gameMode = 1;
+                    resetGameVariables();
+
+                }
+
+                if (isBtnClicked(menuButtonXFromGameOver, menuButtonYFromGameOver)) {
+
+                    gameMode = -1;
+                    goToMenu();
+
+                }
+
+                if (isBtnClicked(quitButtonXFromGameOver, quitButtonYFromGameOver)) {
+
+                    System.exit(0);
+                    Gdx.app.exit();
+
+                }
+
+            }
 
         }
+
+    }
+
+    private void goToMenu() {
+
+
+
+    }
+
+    private void drawRectangleOverBatch(SpriteBatch batch, int x, int y, int width, int height) {
+
+        batch.end();
+
+        ShapeRenderer renderer = new ShapeRenderer();
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.rect(x, y, width, height);
+        renderer.end();
+
+        batch.begin();
+
+    }
+
+    private boolean isBtnClicked(int btnXFromGameOver, int btnYFromGameOver) {
+
+        int btnXFrom = gameOverDrawingX + btnXFromGameOver;
+        int btnXTo = gameOverDrawingX + btnXFromGameOver + buttonWidth;
+
+        int btnYFrom = gameOverDrawingY + btnYFromGameOver;
+        int btnYTo = gameOverDrawingY + btnYFromGameOver - buttonHeight;
+
+        return ((Gdx.input.getX() >= btnXFrom)
+                && (Gdx.input.getX() <= btnXTo))
+                && ((Gdx.input.getY() <= btnYFrom)
+                && (Gdx.input.getY() >= btnYTo));
 
     }
 
