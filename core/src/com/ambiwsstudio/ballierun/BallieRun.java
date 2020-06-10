@@ -30,27 +30,27 @@ public class BallieRun extends ApplicationAdapter {
     private double ballPositionY = (tileSize * 1.0) + (ballSize * 5);
     private double ballPositionX;
 
-    private int vineWidth = 160;
-    private int vineHeight = 320;
-    private int vineHWidth = 320;
-    private int vineHHeight = 160;
+    private static final int vineWidth = 160;
+    private static final int vineHeight = 320;
+    private static final int vineHWidth = 320;
+    private static final int vineHHeight = 160;
 
     private int gameOverHeight = 600;
     private int gameOverWidth = 1000;
     private int gameOverDrawingX;
     private int gameOverDrawingY;
 
-    private final int buttonWidth = 500;
-    private final int buttonHeight = 60;
+    private static final int buttonWidth = 500;
+    private static final int buttonHeight = 60;
 
-    private final int restartButtonXFromGameOver = 250;
-    private final int restartButtonYFromGameOver = 300;
+    private static final int restartButtonXFromGameOver = 250;
+    private static final int restartButtonYFromGameOver = 300;
 
-    private final int menuButtonXFromGameOver = 250;
-    private final int menuButtonYFromGameOver = 390;
+    private static final int menuButtonXFromGameOver = 250;
+    private static final int menuButtonYFromGameOver = 390;
 
-    private final int quitButtonXFromGameOver = 250;
-    private final int quitButtonYFromGameOver = 480;
+    private static final int quitButtonXFromGameOver = 250;
+    private static final int quitButtonYFromGameOver = 480;
 
     /*
         Game variables (Physics & States)
@@ -58,11 +58,11 @@ public class BallieRun extends ApplicationAdapter {
 
     private final double gravity = 9.8;
     private final double velocityMultiplierConstant = 0.14;
-    private final double velocityDivider = 0.3;
+    private static final double velocityDivider = 0.3;
     private final double velocityXMultiplierConstant = 0.01;
-    private final int velocityXForceDivider = 75;
-    private final int velocityForceDivider = 75;
-    final private int maxVelocity = 10;
+    private static final int velocityXForceDivider = 75;
+    private static final int velocityForceDivider = 75;
+    private static final int maxVelocity = 10;
     private double velocity = 0;
     private double velocityMultiplier = 0.14;
     private int gravityConstant = 1;
@@ -70,7 +70,7 @@ public class BallieRun extends ApplicationAdapter {
     private double velocityXMultiplier = 0.01;
     private int gravityConstantX = 0;
     private double drawableX = 0;
-    private double speed = 0.2;
+    private static final double speed = 0.2;
     private int gameMode = 1;
 
     /*
@@ -79,10 +79,12 @@ public class BallieRun extends ApplicationAdapter {
 
     private int pointerXLast = 0;
     private int pointerYLast = 0;
-    private int pointerXCurrent = 0;
-    private int pointerYCurrent = 0;
-    private int pointerDiffX = 0;
-    private int pointerDiffY = 0;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private static int pointerXCurrent = 0,
+            pointerYCurrent = 0,
+            pointerDiffX = 0,
+            pointerDiffY = 0;
 
     private boolean isTouchedOnce = false;
     private boolean isInjectedForce = true;
@@ -296,6 +298,7 @@ public class BallieRun extends ApplicationAdapter {
 
     }
 
+    @SuppressWarnings("unused")
     private void drawRectangleOverBatch(SpriteBatch batch, int x, int y, int width, int height) {
 
         batch.end();
