@@ -28,7 +28,6 @@ public class BallieRun extends ApplicationAdapter {
     private final double velocityXMultiplierConstant = 0.01;
     private int gravityConstantX = 0;
     private int velocityXForceDivider = 75;
-    private int currentRotation = 0;
 
     private int pointerXLast = 0;
     private int pointerYLast = 0;
@@ -41,6 +40,7 @@ public class BallieRun extends ApplicationAdapter {
     private boolean isInjectedForce = true;
 
     private Texture ball;
+    private Texture ball2;
 
     private boolean isBallForceUp = false;
     private boolean isBallForceSide = false;
@@ -51,6 +51,7 @@ public class BallieRun extends ApplicationAdapter {
         background = new Texture("Background.png");
         defaultTile = new Texture("Tile_2.png");
         ball = new Texture("ball.png");
+        ball2 = new Texture("ball2.png");
     }
 
 
@@ -156,6 +157,12 @@ public class BallieRun extends ApplicationAdapter {
     private void renderBall(SpriteBatch batch) {
 
         batch.draw(ball, (int) ballPositionX, (int) ballPositionY, ballSize, ballSize);
+
+        if (Gdx.input.isTouched()) {
+
+            batch.draw(ball2, (int)(pointerXLast - (ballSize * 1.0 / 2)), (int)(Math.abs(Gdx.graphics.getHeight() - pointerYLast) - (ballSize * 1.0 / 2)), ballSize, ballSize);
+
+        }
 
         if (isBallForceSide) {
 
