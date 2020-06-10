@@ -28,6 +28,7 @@ public class BallieRun extends ApplicationAdapter {
     private final double velocityXMultiplierConstant = 0.01;
     private int gravityConstantX = 0;
     private int velocityXForceDivider = 75;
+    private int currentRotation = 0;
 
     private int pointerXLast = 0;
     private int pointerYLast = 0;
@@ -47,8 +48,8 @@ public class BallieRun extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        background = new Texture("bg.png");
-        defaultTile = new Texture("Tile001.JPG");
+        background = new Texture("Background.png");
+        defaultTile = new Texture("Tile_2.png");
         ball = new Texture("ball.png");
     }
 
@@ -81,6 +82,9 @@ public class BallieRun extends ApplicationAdapter {
                 pointerDiffX = pointerXLast - pointerXCurrent;
                 pointerDiffY = pointerYLast - pointerYCurrent;
 
+                if (pointerDiffX == 0 && pointerDiffY == 0)
+                    return;
+
                 velocityMultiplier = velocityMultiplierConstant;
 
                 if (pointerDiffY < 0) {
@@ -89,19 +93,22 @@ public class BallieRun extends ApplicationAdapter {
                     gravityConstant = -1;
                     velocity = (-pointerDiffY * 1.0 / velocityForceDivider);
 
-                }
-
-                if (pointerDiffY > 0) {
+                } else if (pointerDiffY > 0) {
 
                     isBallForceUp = false;
                     gravityConstant = 1;
                     velocity = velocity + (pointerDiffY * 1.0 / velocityForceDivider);
 
+                } else {
+
+                    isBallForceUp = false;
+                    gravityConstant = 1;
+                    velocity = 0;
+
                 }
 
                 if (pointerDiffX > 0) {
 
-                    //velocityX = velocityX + (pointerDiffX * 1.0 / velocityXForceDivider);
                     velocityX = (pointerDiffX * 1.0 / velocityXForceDivider);
                     gravityConstantX = 1;
                     velocityXMultiplier = velocityXMultiplierConstant;
@@ -111,7 +118,6 @@ public class BallieRun extends ApplicationAdapter {
 
                 if (pointerDiffX < 0) {
 
-                    //velocityX = velocityX + (-pointerDiffX * 1.0 / velocityXForceDivider);
                     velocityX = (-pointerDiffX * 1.0 / velocityXForceDivider);
                     gravityConstantX = -1;
                     velocityXMultiplier = velocityXMultiplierConstant;
@@ -150,8 +156,6 @@ public class BallieRun extends ApplicationAdapter {
     private void renderBall(SpriteBatch batch) {
 
         batch.draw(ball, (int) ballPositionX, (int) ballPositionY, ballSize, ballSize);
-
-        System.out.println(velocityX);
 
         if (isBallForceSide) {
 
@@ -213,12 +217,12 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
-        if (ballPositionY < tileSize) {
+        if (ballPositionY < (tileSize * 1.0 / 2)) {
 
-            if (velocityX < 0.5)
-                velocityX = 0.5;
+            if (velocityX < 0.3)
+                velocityX = 0.3;
 
-            ballPositionY = tileSize;
+            ballPositionY = (tileSize * 1.0 / 2);
             gravityConstant = -1;
 
             if (velocity < 1.1) {
