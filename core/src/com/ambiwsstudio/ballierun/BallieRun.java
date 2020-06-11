@@ -137,7 +137,7 @@ public class BallieRun extends ApplicationAdapter {
     private int powerBallRandY = 0;
     private String powerBallTip = "";
 
-    private class VineEnemy {
+    private static class VineEnemy {
 
         Rectangle vineRectangle;
         double drawableXEnvironment = 0;
@@ -193,6 +193,30 @@ public class BallieRun extends ApplicationAdapter {
         ball = new Texture("ball.png");
         ballMode = 0;
         powerBallTip = "";
+
+        drawableX = 0;
+        speed = 0.5;
+        vineGeneratorLockTilesCount = 0;
+        powerBallRandY = 0;
+
+        vineEnemies.clear();
+
+        pointerXLast = 0;
+        pointerYLast = 0;
+
+        pointerXCurrent = 0;
+        pointerYCurrent = 0;
+        pointerDiffX = 0;
+        pointerDiffY = 0;
+
+        isTouchedOnce = false;
+        isInjectedForce = true;
+        isBallForceUp = false;
+        isBallForceSide = false;
+        isEnvironmentLifeTileActive = false;
+        isTreeDamaged = false;
+        isVinePreviouslyGenerated = false;
+        isPowerBallTileActive = false;
 
     }
 
@@ -259,7 +283,6 @@ public class BallieRun extends ApplicationAdapter {
                 ballPositionY = Gdx.graphics.getHeight() - (Gdx.input.getY() + (int) (ballSize * 1.0 / 2));
 
                 ballRectangle = new Rectangle((int) ballPositionX, (int) ballPositionY, ballSize, ballSize);
-                //drawRectangleOverBatch(batch, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), ballSize, ballSize);
 
                 velocityX = 0;
                 velocityXMultiplier = velocityXMultiplierConstant;
@@ -382,14 +405,14 @@ public class BallieRun extends ApplicationAdapter {
                 double powerBallRandom = Math.random();
                 System.out.println(powerBallRandom);
 
-                if (powerBallRandom < 0.5) {
+                if (powerBallRandom <= 0.025) {
 
                     isPowerBallTileActive = true;
                     drawableXPowerBall = 0;
                     currentPowerBall = powerBallP;
                     powerBallRandY = (int) (Math.random() * 900) + (tileSize / 2);
 
-                } else if (powerBallRandom >= 0.5) {
+                } else if (powerBallRandom >= 0.975) {
 
                     isPowerBallTileActive = true;
                     drawableXPowerBall = 0;
@@ -491,7 +514,6 @@ public class BallieRun extends ApplicationAdapter {
                 int currentXPowerBallPosition = (int) (Gdx.graphics.getWidth() - drawableXPowerBall);
 
                 powerBallRectangle = new Rectangle(currentXPowerBallPosition, powerBallRandY, (int) (ballSize * 1.0 / 2), (int) (ballSize * 1.0 / 2));
-                //drawRectangleOverBatch(batch, currentXPowerBallPosition, powerBallRandY, (int)(ballSize * 1.0 / 2), (int)(ballSize * 1.0 / 2));
 
                 drawableXPowerBall += (speed * 9);
                 batch.draw(currentPowerBall, currentXPowerBallPosition, powerBallRandY, (int) (ballSize * 1.0 / 2), (int) (ballSize * 1.0 / 2));
@@ -850,13 +872,6 @@ public class BallieRun extends ApplicationAdapter {
 
         if (gameMode == -1) {
 
-            // TODO:
-            // Fix collision between ball and menu-image.
-            // Processor can't work too fast.
-            // When ball has high velocity, Intersector can match
-            // collision with menu-ceil, when it must be left wall.
-            // It cause small gui-glitch (ball blink-effect).
-
             Rectangle leftMenuWall = new Rectangle(menuDrawingX, menuDrawingY, 1, menuHeight);
             Rectangle upMenuCeil = new Rectangle(menuDrawingX + 16, menuDrawingY + menuHeight + 4, menuWidth, 4);
 
@@ -902,9 +917,9 @@ public class BallieRun extends ApplicationAdapter {
 
                 } else {
 
-                    ballPositionX = treeRectangle.x - ballSize - 8;
+                    ballPositionX = treeRectangle.x - ballSize - 16;
                     gravityConstantX = -1;
-                    velocityX += (speed * 2);
+                    //velocityX += (speed * 2);
                     treeDamage++;
 
                 }
@@ -1046,4 +1061,26 @@ public class BallieRun extends ApplicationAdapter {
         currentPowerBall.dispose();
         System.exit(0);
     }
+
+    // TODO:
+    //    // Fix collision between ball and menu-image:
+    //    // Processor can't work too fast.
+    //    // When ball has high velocity, Intersector can match
+    //    // collision with menu-ceil, when it must be left wall.
+    //    // It cause small gui-glitch (ball blink-effect).
+
+    // TODO:
+    //    // Fix random powerBall disappearing:
+    //    // because of generating new
+
+    // TODO:
+    //    // Sometimes after restart or TP powerBall:
+    //    // insane velocity of ball, that cause istadie on hardmode
+
+    // TODO:
+    //    // Sometimes powerBall works less, than 15 sec
+
+    // TODO:
+    //    // Fix tree push on high-speed
+
 }
