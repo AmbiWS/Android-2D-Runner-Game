@@ -23,6 +23,8 @@ public class BallieRun extends ApplicationAdapter {
     private Texture vineVerticalReversed;
     private Texture gameOver;
     private Texture menu;
+    private Texture credits;
+    private Texture aboutGame;
     private Rectangle ballRectangle = new Rectangle();
 
     /*
@@ -34,47 +36,53 @@ public class BallieRun extends ApplicationAdapter {
     private double ballPositionY = (tileSize * 1.0) + (ballSize * 5);
     private double ballPositionX;
 
-    private static final int vineWidth = 160;
-    private static final int vineHeight = 320;
-    private static final int vineHWidth = 320;
-    private static final int vineHHeight = 160;
+    private final int vineWidth = 160;
+    private final int vineHeight = 320;
+    private final int vineHWidth = 320;
+    private final int vineHHeight = 160;
 
     private int gameOverHeight = 600;
     private int gameOverWidth = 1000;
     private int gameOverDrawingX;
     private int gameOverDrawingY;
 
-    private static final int menuWidth = 600;
-    private static final int menuHeight = 750;
-    private static final int menuDrawingY = -220;
+    private int creditsHeight = 900;
+    private int creditsWidth = 1200;
+
+    private int aboutGameHeight = 900;
+    private int aboutGameWidth = 1200;
+
+    private final int menuWidth = 600;
+    private final int menuHeight = 750;
+    private final int menuDrawingY = -220;
     private int menuDrawingX;
 
-    private static final int buttonWidth = 500;
-    private static final int buttonHeight = 60;
+    private final int buttonWidth = 500;
+    private final int buttonHeight = 60;
 
-    private static final int restartButtonXFromGameOver = 250;
-    private static final int restartButtonYFromGameOver = 300;
+    private final int restartButtonXFromGameOver = 250;
+    private final int restartButtonYFromGameOver = 300;
 
-    private static final int menuButtonXFromGameOver = 250;
-    private static final int menuButtonYFromGameOver = 390;
+    private final int menuButtonXFromGameOver = 250;
+    private final int menuButtonYFromGameOver = 390;
 
-    private static final int quitButtonXFromGameOver = 250;
-    private static final int quitButtonYFromGameOver = 480;
+    private final int quitButtonXFromGameOver = 250;
+    private final int quitButtonYFromGameOver = 480;
 
-    private static int startEasyGameButtonYFromMenu = menuDrawingY + menuHeight - 190;
-    private static int startEasyGameButtonXFromMenu;
+    private int startEasyGameButtonYFromMenu = menuDrawingY + menuHeight - 190;
+    private int startEasyGameButtonXFromMenu;
 
-    private static int startHardGameButtonYFromMenu = menuDrawingY + menuHeight - 255;
-    private static int startHardGameButtonXFromMenu;
+    private int startHardGameButtonYFromMenu = menuDrawingY + menuHeight - 255;
+    private int startHardGameButtonXFromMenu;
 
-    private static int creditsButtonYFromMenu = menuDrawingY + menuHeight - 325;
-    private static int creditsButtonXFromMenu;
+    private int creditsButtonYFromMenu = menuDrawingY + menuHeight - 325;
+    private int creditsButtonXFromMenu;
 
-    private static int aboutAppButtonYFromMenu = menuDrawingY + menuHeight - 395;
-    private static int aboutAppButtonXFromMenu;
+    private int aboutAppButtonYFromMenu = menuDrawingY + menuHeight - 395;
+    private int aboutAppButtonXFromMenu;
 
-    private static int quitButtonYFromMenu = menuDrawingY + menuHeight - 470;
-    private static int quitButtonXFromMenu;
+    private int quitButtonYFromMenu = menuDrawingY + menuHeight - 470;
+    private int quitButtonXFromMenu;
 
     /*
         Game variables (Physics & States)
@@ -82,11 +90,11 @@ public class BallieRun extends ApplicationAdapter {
 
     private final double gravity = 9.8;
     private final double velocityMultiplierConstant = 0.14;
-    private static final double velocityDivider = 0.3;
+    private final double velocityDivider = 0.3;
     private final double velocityXMultiplierConstant = 0.01;
-    private static final int velocityXForceDivider = 75;
-    private static final int velocityForceDivider = 75;
-    private static final int maxVelocity = 10;
+    private final int velocityXForceDivider = 75;
+    private final int velocityForceDivider = 75;
+    private final int maxVelocity = 10;
     private double velocity = 0;
     private double velocityMultiplier = 0.14;
     private int gravityConstant = 1;
@@ -94,7 +102,7 @@ public class BallieRun extends ApplicationAdapter {
     private double velocityXMultiplier = 0.01;
     private int gravityConstantX = 0;
     private double drawableX = 0;
-    private static final double speed = 0.2;
+    private final double speed = 0.2;
     private int gameMode = -1;
 
     /*
@@ -105,7 +113,7 @@ public class BallieRun extends ApplicationAdapter {
     private int pointerYLast = 0;
 
     @SuppressWarnings("FieldCanBeLocal")
-    private static int pointerXCurrent = 0,
+    private int pointerXCurrent = 0,
             pointerYCurrent = 0,
             pointerDiffX = 0,
             pointerDiffY = 0;
@@ -140,6 +148,8 @@ public class BallieRun extends ApplicationAdapter {
         vineVerticalReversed = new Texture("vinevr.png");
         gameOver = new Texture("gameover.png");
         menu = new Texture("menu.png");
+        credits = new Texture("credits.png");
+        aboutGame = new Texture("aboutgame.png");
 
         ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int)(ballSize * 1.0 / 2);
         gameOverDrawingX = (int) ((Gdx.graphics.getWidth() * 1.0 / 2) - gameOverWidth / 2);
@@ -250,7 +260,7 @@ public class BallieRun extends ApplicationAdapter {
 
         batch.draw(background, 0, 0);
 
-        if (gameMode != -1 && gameMode != 2) {
+        if (gameMode != -1 && gameMode != 2 && gameMode != 3 && gameMode != 4) {
 
             int vineHorI = 0;
             do {
@@ -283,7 +293,7 @@ public class BallieRun extends ApplicationAdapter {
             if (gameMode == 1 || gameMode == 2)
                 drawableX += speed;
 
-            if (gameMode != -1) {
+            if (gameMode != -1 && gameMode != 0 && gameMode != 3 && gameMode != 4) {
 
                 if (velocity == 0) {
 
@@ -324,13 +334,11 @@ public class BallieRun extends ApplicationAdapter {
 
                     gameMode = -1;
                     resetGameVariables();
-                    goToMenu();
 
                 }
 
                 if (isBtnClicked(quitButtonXFromGameOver, quitButtonYFromGameOver, gameOverDrawingX, gameOverDrawingY)) {
 
-                    System.exit(0);
                     Gdx.app.exit();
 
                 }
@@ -353,21 +361,26 @@ public class BallieRun extends ApplicationAdapter {
 
                 if (isBtnClicked(creditsButtonXFromMenu, creditsButtonYFromMenu)) {
 
-                    System.out.println("Credits");
+                    gameMode = 3;
 
                 }
 
                 if (isBtnClicked(aboutAppButtonXFromMenu, aboutAppButtonYFromMenu)) {
 
-                    System.out.println("About App");
+                    gameMode = 4;
 
                 }
 
                 if (isBtnClicked(quitButtonXFromMenu, quitButtonYFromMenu)) {
 
-                    System.out.println("Quit");
+                    Gdx.app.exit();
 
                 }
+
+            } else if (gameMode == 3 || gameMode == 4) {
+
+                gameMode = -1;
+                resetGameVariables();
 
             }
 
@@ -379,12 +392,19 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
-    }
+        if (gameMode == 3) {
 
-    private void goToMenu() {
+            batch.draw(credits, (int)(Gdx.graphics.getWidth() * 1.0 / 2 - creditsWidth / 2), (int)(Gdx.graphics.getHeight() * 1.0 / 2 - creditsHeight / 2),
+                        creditsWidth, creditsHeight);
 
+        }
 
+        if (gameMode == 4) {
 
+            batch.draw(aboutGame, (int)(Gdx.graphics.getWidth() * 1.0 / 2 - aboutGameWidth / 2), (int)(Gdx.graphics.getHeight() * 1.0 / 2 - aboutGameHeight / 2),
+                        aboutGameWidth, aboutGameHeight);
+
+        }
     }
 
     @SuppressWarnings("unused")
@@ -558,7 +578,7 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
-        if (gameMode != -1 && gameMode != 2) {
+        if (gameMode != -1 && gameMode != 2 && gameMode != 3 && gameMode != 4) {
 
             if (ballPositionX < 48
                     || (ballPositionX + ballSize > Gdx.graphics.getWidth() - 48)
@@ -588,6 +608,16 @@ public class BallieRun extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         ball.dispose();
+        defaultTile.dispose();
+        ball.dispose();
+        vineHorizontal.dispose();
+        vineVertical.dispose();
+        vineVerticalReversed.dispose();
+        gameOver.dispose();
+        menu.dispose();
+        credits.dispose();
         background.dispose();
+        aboutGame.dispose();
+        System.exit(0);
     }
 }
