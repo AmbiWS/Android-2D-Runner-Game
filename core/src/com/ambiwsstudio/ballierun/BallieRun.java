@@ -220,7 +220,6 @@ public class BallieRun extends ApplicationAdapter {
     private void renderEnvironment(SpriteBatch batch) {
 
         speed = 0.5 + (score * 1.0 / 10000);
-        System.out.println(speed);
 
         if (Gdx.input.isTouched()) {
 
