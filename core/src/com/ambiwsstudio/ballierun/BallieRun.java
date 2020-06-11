@@ -586,7 +586,8 @@ public class BallieRun extends ApplicationAdapter {
                 drawableXEnvironment += (speed * 9);
                 Texture currentTree = tree;
 
-                if (currentXEnvironmentPosition < 0 && !isTreeDamaged && ballPositionX < currentXEnvironmentPosition) {
+                if (currentXEnvironmentPosition < -(treeSize / 3) && !isTreeDamaged && ballPositionX > currentXEnvironmentPosition
+                        && ballPositionX < (currentXEnvironmentPosition + treeSize - (treeSize * 1.0 / 3))) {
 
                     isEnvironmentLifeTileActive = false;
                     drawableXEnvironment = 0;
@@ -1145,6 +1146,7 @@ public class BallieRun extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+
         batch.dispose();
         ball.dispose();
         defaultTile.dispose();
@@ -1168,31 +1170,9 @@ public class BallieRun extends ApplicationAdapter {
         ballA.dispose();
         ballSkin.dispose();
         prizeTree.dispose();
+
         System.exit(0);
+
     }
-
-    // TODO:
-    //    // Fix collision between ball and menu-image:
-    //    // Processor can't work too fast.
-    //    // When ball has high velocity, Intersector can match
-    //    // collision with menu-ceil, when it must be left wall.
-    //    // It cause small gui-glitch (ball blink-effect).
-
-    // TODO:
-    //    // Fix random powerBall disappearing:
-    //    // because of generating new
-
-    // TODO: ACTUAL
-    //    // Sometimes after restart or TP powerBall:
-    //    // insane velocity of ball, that cause istadie on hardmode
-
-    // TODO: ACTUAL
-    //    // Sometimes powerBall works less, than 15 sec
-
-    // TODO: ACTUAL
-    //    // Fix tree push on high-speed
-
-    // TODO: ACTUAL
-    //    // Replace numbers on constants for SOLID
 
 }
