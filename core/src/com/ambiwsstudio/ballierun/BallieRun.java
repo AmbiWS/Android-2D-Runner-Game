@@ -61,6 +61,21 @@ public class BallieRun extends ApplicationAdapter {
     private static final int quitButtonXFromGameOver = 250;
     private static final int quitButtonYFromGameOver = 480;
 
+    private static int startEasyGameButtonYFromMenu = menuDrawingY + menuHeight - 190;
+    private static int startEasyGameButtonXFromMenu;
+
+    private static int startHardGameButtonYFromMenu = menuDrawingY + menuHeight - 255;
+    private static int startHardGameButtonXFromMenu;
+
+    private static int creditsButtonYFromMenu = menuDrawingY + menuHeight - 325;
+    private static int creditsButtonXFromMenu;
+
+    private static int aboutAppButtonYFromMenu = menuDrawingY + menuHeight - 395;
+    private static int aboutAppButtonXFromMenu;
+
+    private static int quitButtonYFromMenu = menuDrawingY + menuHeight - 470;
+    private static int quitButtonXFromMenu;
+
     /*
         Game variables (Physics & States)
      */
@@ -130,6 +145,20 @@ public class BallieRun extends ApplicationAdapter {
         gameOverDrawingX = (int) ((Gdx.graphics.getWidth() * 1.0 / 2) - gameOverWidth / 2);
         gameOverDrawingY = (int) ((Gdx.graphics.getHeight() * 1.0 / 2) - gameOverHeight / 2);
         menuDrawingX = Gdx.graphics.getWidth() - menuWidth;
+
+        startEasyGameButtonXFromMenu
+                = startHardGameButtonXFromMenu
+                = creditsButtonXFromMenu
+                = aboutAppButtonXFromMenu
+                = quitButtonXFromMenu
+                = menuDrawingX + 50;
+
+        startEasyGameButtonYFromMenu = Gdx.graphics.getHeight() - startEasyGameButtonYFromMenu;
+        startHardGameButtonYFromMenu = Gdx.graphics.getHeight() - startHardGameButtonYFromMenu;
+        creditsButtonYFromMenu = Gdx.graphics.getHeight() - creditsButtonYFromMenu;
+        aboutAppButtonYFromMenu = Gdx.graphics.getHeight() - aboutAppButtonYFromMenu;
+        quitButtonYFromMenu = Gdx.graphics.getHeight() - quitButtonYFromMenu;
+
     }
 
     private void renderEnvironment(SpriteBatch batch) {
@@ -221,7 +250,7 @@ public class BallieRun extends ApplicationAdapter {
 
         batch.draw(background, 0, 0);
 
-        if (gameMode != -1) {
+        if (gameMode != -1 && gameMode != 2) {
 
             int vineHorI = 0;
             do {
@@ -251,7 +280,7 @@ public class BallieRun extends ApplicationAdapter {
 
             batch.draw(defaultTile, (int) (i * tileSize - drawableX), 0, tileSize, tileSize);
 
-            if (gameMode == 1)
+            if (gameMode == 1 || gameMode == 2)
                 drawableX += speed;
 
             if (gameMode != -1) {
@@ -284,24 +313,59 @@ public class BallieRun extends ApplicationAdapter {
 
             if (gameMode == 0) {
 
-                if (isBtnClicked(restartButtonXFromGameOver, restartButtonYFromGameOver)) {
+                if (isBtnClicked(restartButtonXFromGameOver, restartButtonYFromGameOver, gameOverDrawingX, gameOverDrawingY)) {
 
                     gameMode = 1;
                     resetGameVariables();
 
                 }
 
-                if (isBtnClicked(menuButtonXFromGameOver, menuButtonYFromGameOver)) {
+                if (isBtnClicked(menuButtonXFromGameOver, menuButtonYFromGameOver, gameOverDrawingX, gameOverDrawingY)) {
 
                     gameMode = -1;
+                    resetGameVariables();
                     goToMenu();
 
                 }
 
-                if (isBtnClicked(quitButtonXFromGameOver, quitButtonYFromGameOver)) {
+                if (isBtnClicked(quitButtonXFromGameOver, quitButtonYFromGameOver, gameOverDrawingX, gameOverDrawingY)) {
 
                     System.exit(0);
                     Gdx.app.exit();
+
+                }
+
+            } else if (gameMode == -1) {
+
+                if (isBtnClicked(startEasyGameButtonXFromMenu, startEasyGameButtonYFromMenu)) {
+
+                    gameMode = 2;
+                    resetGameVariables();
+
+                }
+
+                if (isBtnClicked(startHardGameButtonXFromMenu, startHardGameButtonYFromMenu)) {
+
+                    gameMode = 1;
+                    resetGameVariables();
+
+                }
+
+                if (isBtnClicked(creditsButtonXFromMenu, creditsButtonYFromMenu)) {
+
+                    System.out.println("Credits");
+
+                }
+
+                if (isBtnClicked(aboutAppButtonXFromMenu, aboutAppButtonYFromMenu)) {
+
+                    System.out.println("About App");
+
+                }
+
+                if (isBtnClicked(quitButtonXFromMenu, quitButtonYFromMenu)) {
+
+                    System.out.println("Quit");
 
                 }
 
@@ -337,13 +401,13 @@ public class BallieRun extends ApplicationAdapter {
 
     }
 
-    private boolean isBtnClicked(int btnXFromGameOver, int btnYFromGameOver) {
+    private boolean isBtnClicked(int btnXFromGameOver, int btnYFromGameOver, int sourceX, int sourceY) {
 
-        int btnXFrom = gameOverDrawingX + btnXFromGameOver;
-        int btnXTo = gameOverDrawingX + btnXFromGameOver + buttonWidth;
+        int btnXFrom = sourceX + btnXFromGameOver;
+        int btnXTo = sourceX + btnXFromGameOver + buttonWidth;
 
-        int btnYFrom = gameOverDrawingY + btnYFromGameOver;
-        int btnYTo = gameOverDrawingY + btnYFromGameOver - buttonHeight;
+        int btnYFrom = sourceY + btnYFromGameOver;
+        int btnYTo = sourceY + btnYFromGameOver - buttonHeight;
 
         return ((Gdx.input.getX() >= btnXFrom)
                 && (Gdx.input.getX() <= btnXTo))
@@ -352,10 +416,24 @@ public class BallieRun extends ApplicationAdapter {
 
     }
 
+    private boolean isBtnClicked(int btnXFromGameOver, int btnYFromGameOver) {
+
+        int btnXTo = btnXFromGameOver + buttonWidth;
+
+        int btnYTo = btnYFromGameOver - buttonHeight;
+
+        return ((Gdx.input.getX() >= btnXFromGameOver)
+                && (Gdx.input.getX() <= btnXTo))
+                && ((Gdx.input.getY() <= btnYFromGameOver)
+                && (Gdx.input.getY() >= btnYTo));
+
+    }
+
     private void renderBall(SpriteBatch batch) {
 
         if (gameMode == 1
-                || gameMode == -1) {
+                || gameMode == -1
+                || gameMode == 2) {
 
             batch.draw(ball, (int) ballPositionX, (int) ballPositionY, ballSize, ballSize);
             ballRectangle = new Rectangle((int)ballPositionX, (int)ballPositionY, ballSize, ballSize);
@@ -480,7 +558,7 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
-        if (gameMode != -1) {
+        if (gameMode != -1 && gameMode != 2) {
 
             if (ballPositionX < 48
                     || (ballPositionX + ballSize > Gdx.graphics.getWidth() - 48)
