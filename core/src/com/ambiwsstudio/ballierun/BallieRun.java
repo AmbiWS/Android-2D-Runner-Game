@@ -8,6 +8,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 
+import org.omg.CosNaming.BindingIterator;
+
+import java.util.ArrayList;
+
 public class BallieRun extends ApplicationAdapter {
 
     /*
@@ -29,6 +33,7 @@ public class BallieRun extends ApplicationAdapter {
     private Texture damagedTree;
     private Rectangle ballRectangle = new Rectangle();
     private Rectangle treeRectangle = new Rectangle();
+    private ArrayList<VineEnemy> vineEnemies = new ArrayList<>();
 
     /*
         Sizes & Points
@@ -45,6 +50,8 @@ public class BallieRun extends ApplicationAdapter {
     private final int vineHeight = 320;
     private final int vineHWidth = 320;
     private final int vineHHeight = 160;
+    private final int vineWidthEnemy = 256;
+    private final int vineHeightEnemy = 512;
 
     private int gameOverHeight = 600;
     private int gameOverWidth = 1000;
@@ -110,9 +117,16 @@ public class BallieRun extends ApplicationAdapter {
     private double drawableXEnvironment = 0;
     private final double speed = 0.2;
     private int gameMode = -1;
-    private int environmentLifeTileIndex = 0;
     private int lastGameMode = 0;
     private int treeDamage = 0;
+
+    private class VineEnemy {
+
+        Rectangle vineRectangle;
+        double drawableXEnvironment = 0;
+        boolean isFloorVine = true;
+
+    }
 
     /*
         User-input variables & Booleans
@@ -279,10 +293,30 @@ public class BallieRun extends ApplicationAdapter {
 
             drawableX = 0;
 
-            if (!isEnvironmentLifeTileActive && Math.random() <= 1) {
+            if (!isEnvironmentLifeTileActive && Math.random() <= 0.2) {
 
                 isEnvironmentLifeTileActive = true;
                 drawableXEnvironment = 0;
+
+            }
+
+            if (vineEnemies.size() < 3) {
+
+                double vineRandom = Math.random();
+
+                if (vineRandom <= 0.2) {
+
+                    VineEnemy vineEnemy = new VineEnemy();
+                    vineEnemy.isFloorVine = true;
+                    vineEnemies.add(vineEnemy);
+
+                } else if (vineRandom >= 0.8) {
+
+                    VineEnemy vineEnemy = new VineEnemy();
+                    vineEnemy.isFloorVine = false;
+                    vineEnemies.add(vineEnemy);
+
+                }
 
             }
 
@@ -320,6 +354,43 @@ public class BallieRun extends ApplicationAdapter {
                 }
 
                 batch.draw(currentTree, currentXEnvironmentPosition, (int) (tileSize * 1.0 / 2), treeSize, treeSize);
+
+            }
+
+            if (vineEnemies.size() > 0) {
+
+                System.out.println(vineEnemies.size());
+                ArrayList<VineEnemy> tempVineEnemies = vineEnemies;
+                int idxToRemove = -1;
+
+                for (int i = 0; i < tempVineEnemies.size(); i++) {
+
+                    int currentXVinePosition;
+
+                    if (tempVineEnemies.get(i).isFloorVine) {
+
+                        currentXVinePosition = (int) (Gdx.graphics.getWidth() - tempVineEnemies.get(i).drawableXEnvironment);
+                        batch.draw(vineVertical, currentXVinePosition, (int)(tileSize * 1.0 / 2) - 40, vineWidthEnemy, vineHeightEnemy);
+
+                    } else {
+
+                        currentXVinePosition = (int) (Gdx.graphics.getWidth() - tempVineEnemies.get(i).drawableXEnvironment);
+                        batch.draw(vineVerticalReversed, currentXVinePosition, Gdx.graphics.getHeight() - vineHeightEnemy + 40, vineWidthEnemy, vineHeightEnemy);
+
+                    }
+
+                    tempVineEnemies.get(i).drawableXEnvironment += (speed * 9);
+
+                    if (currentXVinePosition < -vineWidthEnemy) {
+
+                        idxToRemove = i;
+
+                    }
+
+                }
+
+                if (idxToRemove != -1)
+                    vineEnemies.remove(idxToRemove);
 
             }
 
