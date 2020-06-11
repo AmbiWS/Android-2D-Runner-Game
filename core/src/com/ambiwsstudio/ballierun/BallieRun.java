@@ -52,7 +52,7 @@ public class BallieRun extends ApplicationAdapter {
     private Preferences prefs;
 
     /*
-        Sizes & Points
+        Sizes & Points (Initialized for main 1920W resolution)
      */
 
     private int deviceWidth;
@@ -173,6 +173,7 @@ public class BallieRun extends ApplicationAdapter {
     private int velocityXSpeedDivider = 10;
     private int menuOffsetValue = 4;
     private int treeOffsetValue = 16;
+    private int menuOffset = 50;
     private String powerBallTip = "";
 
     private static class VineEnemy {
@@ -277,6 +278,10 @@ public class BallieRun extends ApplicationAdapter {
         deviceHeight = Gdx.graphics.getHeight();
         deviceWidth = Gdx.graphics.getWidth();
 
+        /*
+            Prize for finishing the game
+         */
+
         prefs = Gdx.app.getPreferences("My Preferences");
         prefs.remove("ball");
 
@@ -294,24 +299,9 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
-        ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int) (ballSize * 1.0 / 2);
-        gameOverDrawingX = (int) ((Gdx.graphics.getWidth() * 1.0 / 2) - gameOverWidth / 2);
-        gameOverDrawingY = (int) ((Gdx.graphics.getHeight() * 1.0 / 2) - gameOverHeight / 2);
-        menuDrawingX = Gdx.graphics.getWidth() - menuWidth;
-
-        startEasyGameButtonYFromMenu = Gdx.graphics.getHeight() - startEasyGameButtonYFromMenu;
-        startHardGameButtonYFromMenu = Gdx.graphics.getHeight() - startHardGameButtonYFromMenu;
-        creditsButtonYFromMenu = Gdx.graphics.getHeight() - creditsButtonYFromMenu;
-        aboutAppButtonYFromMenu = Gdx.graphics.getHeight() - aboutAppButtonYFromMenu;
-        quitButtonYFromMenu = Gdx.graphics.getHeight() - quitButtonYFromMenu;
-
-        int menuOffset = 50;
-        startEasyGameButtonXFromMenu
-                = startHardGameButtonXFromMenu
-                = creditsButtonXFromMenu
-                = aboutAppButtonXFromMenu
-                = quitButtonXFromMenu
-                = menuDrawingX + menuOffset;
+        /*
+            Misc vars
+         */
 
         font = new BitmapFont();
         font.setColor(Color.WHITE);
@@ -326,12 +316,15 @@ public class BallieRun extends ApplicationAdapter {
         forest.setVolume(soundVolume);
         forest.play();
 
+        currentPowerBall = ball;
         ballSound = Gdx.audio.newMusic(Gdx.files.internal("ball.wav"));
         ballSound.setVolume(ballVolume);
 
         timer = new Timer();
 
-        currentPowerBall = ball;
+        /*
+            Adaptive design
+         */
 
         if (Gdx.graphics.getWidth() <= 800) {
 
@@ -341,7 +334,124 @@ public class BallieRun extends ApplicationAdapter {
 
             setupW1280Graphics();
 
+        } else if (Gdx.graphics.getWidth() <= 1920) {
+
+            setupW1920Graphics();
+
+        } else if (Gdx.graphics.getWidth() <= 2560) {
+
+            setupW2560Graphics();
+
+        } else {
+
+            System.exit(-1);
+
         }
+    }
+
+    private void setupW2560Graphics() {
+
+        ballsToHeight = 4;
+        ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
+
+        tileSize *= 1.5;
+        ballSize *= 1.5;
+
+        buttonWidth *= 1.5;
+        buttonHeight *= 1.5;
+
+        menuHeight *= 1.5;
+        menuWidth *= 1.5;
+        menuDrawingX = deviceWidth - menuWidth;
+        menuDrawingY *= 1.5;
+
+        startEasyGameButtonXFromMenu
+                = startHardGameButtonXFromMenu
+                = creditsButtonXFromMenu
+                = aboutAppButtonXFromMenu
+                = quitButtonXFromMenu
+                = menuDrawingX + (int)(menuOffset * 1.5);
+
+        startEasyGameButtonYFromMenu = 925;
+        startHardGameButtonYFromMenu = 1030;
+        creditsButtonYFromMenu = 1135;
+        aboutAppButtonYFromMenu = 1240;
+        quitButtonYFromMenu = 1345;
+
+        creditsHeight *= 1.5;
+        creditsWidth *= 1.5;
+
+        aboutGameHeight *= 1.5;
+        aboutGameWidth *= 1.5;
+
+        gameOverHeight *= 1.5;
+        gameOverWidth *= 1.5;
+        gameOverDrawingX = (deviceWidth / 2) - (gameOverWidth / 2);
+        gameOverDrawingY = (deviceHeight / 2) - (gameOverHeight / 2);
+
+        restartButtonXFromGameOver = 370;
+        restartButtonYFromGameOver = 460;
+
+        menuButtonXFromGameOver = 370;
+        menuButtonYFromGameOver = 590;
+
+        quitButtonXFromGameOver = 370;
+        quitButtonYFromGameOver = 730;
+
+        treeSize *= 1.5;
+        vineWidthEnemy *= 1.5;
+        vineHeightEnemy *= 1.5;
+        vineWidth *= 1.5;
+        vineHeight *= 1.5;
+        vineHWidth *= 1.5;
+        vineHHeight *= 1.5;
+
+        font.getData().setScale(fontScale *= 1.5);
+        fontDrawX *= 1.5;
+        fontDrawY *= 1.5;
+
+        sideDeathMargin *= 1.5;
+        upDeathMargin *= 1.5;
+
+        prizeTreeDistanceBetween *= 1.5;
+        treeRectangleOffset *= 1.5;
+
+        vineYOffset1 *= 1.5;
+        vineXOffset1 *= 1.5;
+        vineOffsetValue *= 1.5;
+        menuOffsetValue *= 1.5;
+        treeOffsetValue *= 1.5;
+
+        vineSpeedMultiplier = 8;
+        treeSpeedMultiplier = 8;
+        powerBallSpeedMultiplier = 8;
+
+    }
+
+    private void setupW1920Graphics() {
+
+        /*
+            Main resolution
+         */
+
+        startEasyGameButtonXFromMenu
+                = startHardGameButtonXFromMenu
+                = creditsButtonXFromMenu
+                = aboutAppButtonXFromMenu
+                = quitButtonXFromMenu
+                = menuDrawingX + menuOffset;
+
+        ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int) (ballSize * 1.0 / 2);
+        gameOverDrawingX = (int) ((Gdx.graphics.getWidth() * 1.0 / 2) - gameOverWidth / 2);
+        gameOverDrawingY = (int) ((Gdx.graphics.getHeight() * 1.0 / 2) - gameOverHeight / 2);
+        menuDrawingX = Gdx.graphics.getWidth() - menuWidth;
+
+        startEasyGameButtonYFromMenu = Gdx.graphics.getHeight() - startEasyGameButtonYFromMenu;
+        startHardGameButtonYFromMenu = Gdx.graphics.getHeight() - startHardGameButtonYFromMenu;
+        creditsButtonYFromMenu = Gdx.graphics.getHeight() - creditsButtonYFromMenu;
+        aboutAppButtonYFromMenu = Gdx.graphics.getHeight() - aboutAppButtonYFromMenu;
+        quitButtonYFromMenu = Gdx.graphics.getHeight() - quitButtonYFromMenu;
+
     }
 
     private void setupW1280Graphics() {
@@ -365,7 +475,7 @@ public class BallieRun extends ApplicationAdapter {
                 = creditsButtonXFromMenu
                 = aboutAppButtonXFromMenu
                 = quitButtonXFromMenu
-                = menuDrawingX + (int)(25 * 1.5);
+                = menuDrawingX + (int)((menuOffset / 2) * 1.5);
 
         startEasyGameButtonYFromMenu = 490;
         startHardGameButtonYFromMenu = 540;
@@ -443,7 +553,7 @@ public class BallieRun extends ApplicationAdapter {
                 = creditsButtonXFromMenu
                 = aboutAppButtonXFromMenu
                 = quitButtonXFromMenu
-                = menuDrawingX + 25;
+                = menuDrawingX + (menuOffset / 2);
 
         startEasyGameButtonYFromMenu = 310;
         startHardGameButtonYFromMenu = 345;
@@ -969,8 +1079,11 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
-        //  function to test for adaptive design
-        //  drawRectangleOverBatch(batch, gameOverDrawingX + menuButtonXFromGameOver, deviceHeight - (gameOverDrawingY + menuButtonYFromGameOver), buttonWidth, buttonHeight);
+        /*  Function to test buttons position for adaptive design
+
+            drawRectangleOverBatch(batch, gameOverDrawingX + menuButtonXFromGameOver, deviceHeight - (gameOverDrawingY + menuButtonYFromGameOver), buttonWidth, buttonHeight);
+
+         */
 
         if (Gdx.input.justTouched()) {
 
