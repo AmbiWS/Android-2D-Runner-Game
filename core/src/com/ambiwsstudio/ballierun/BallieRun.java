@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 
 public class BallieRun extends ApplicationAdapter {
 
@@ -20,6 +22,8 @@ public class BallieRun extends ApplicationAdapter {
     private Texture vineVertical;
     private Texture vineVerticalReversed;
     private Texture gameOver;
+    private Texture menu;
+    private Rectangle ballRectangle = new Rectangle();
 
     /*
         Sizes & Points
@@ -39,6 +43,11 @@ public class BallieRun extends ApplicationAdapter {
     private int gameOverWidth = 1000;
     private int gameOverDrawingX;
     private int gameOverDrawingY;
+
+    private static final int menuWidth = 600;
+    private static final int menuHeight = 750;
+    private static final int menuDrawingY = -220;
+    private int menuDrawingX;
 
     private static final int buttonWidth = 500;
     private static final int buttonHeight = 60;
@@ -71,7 +80,7 @@ public class BallieRun extends ApplicationAdapter {
     private int gravityConstantX = 0;
     private double drawableX = 0;
     private static final double speed = 0.2;
-    private int gameMode = 1;
+    private int gameMode = -1;
 
     /*
         User-input variables & Booleans
@@ -115,10 +124,12 @@ public class BallieRun extends ApplicationAdapter {
         vineVertical = new Texture("vinev.png");
         vineVerticalReversed = new Texture("vinevr.png");
         gameOver = new Texture("gameover.png");
+        menu = new Texture("menu.png");
 
         ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int)(ballSize * 1.0 / 2);
         gameOverDrawingX = (int) ((Gdx.graphics.getWidth() * 1.0 / 2) - gameOverWidth / 2);
         gameOverDrawingY = (int) ((Gdx.graphics.getHeight() * 1.0 / 2) - gameOverHeight / 2);
+        menuDrawingX = Gdx.graphics.getWidth() - menuWidth;
     }
 
     private void renderEnvironment(SpriteBatch batch) {
@@ -210,22 +221,26 @@ public class BallieRun extends ApplicationAdapter {
 
         batch.draw(background, 0, 0);
 
-        int vineHorI = 0;
-        do {
+        if (gameMode != -1) {
 
-            batch.draw(vineHorizontal, vineHorI, Gdx.graphics.getHeight() - (int)(vineHHeight * 1.0 / 2) + 5, vineHWidth, vineHHeight);
-            vineHorI += vineHWidth - 20;
+            int vineHorI = 0;
+            do {
 
-        } while (vineHorI < Gdx.graphics.getWidth());
+                batch.draw(vineHorizontal, vineHorI, Gdx.graphics.getHeight() - (int) (vineHHeight * 1.0 / 2) + 5, vineHWidth, vineHHeight);
+                vineHorI += vineHWidth - 20;
 
-        int vineI = 0;
-        do {
+            } while (vineHorI < Gdx.graphics.getWidth());
 
-            batch.draw(vineVertical, 0 - (int)(vineWidth * 1.0 / 3) - 10, vineI, vineWidth, vineHeight);
-            batch.draw(vineVerticalReversed, Gdx.graphics.getWidth() - (int)(vineWidth * 1.0 / 2) - 15, vineI, vineWidth, vineHeight);
-            vineI += vineHeight - 30;
+            int vineI = 0;
+            do {
 
-        } while (vineI < Gdx.graphics.getHeight());
+                batch.draw(vineVertical, 0 - (int) (vineWidth * 1.0 / 3) - 10, vineI, vineWidth, vineHeight);
+                batch.draw(vineVerticalReversed, Gdx.graphics.getWidth() - (int) (vineWidth * 1.0 / 2) - 15, vineI, vineWidth, vineHeight);
+                vineI += vineHeight - 30;
+
+            } while (vineI < Gdx.graphics.getHeight());
+
+        }
 
 
         if (drawableX >= tileSize)
@@ -239,13 +254,17 @@ public class BallieRun extends ApplicationAdapter {
             if (gameMode == 1)
                 drawableX += speed;
 
-            if (velocity == 0) {
+            if (gameMode != -1) {
 
-                if (velocityX <= 0.02) {
+                if (velocity == 0) {
 
-                    gravityConstantX = 1;
-                    velocityX = 0.02;
-                    ballPositionX -= (gravity * velocityX * gravityConstantX);
+                    if (velocityX <= 0.02) {
+
+                        gravityConstantX = 1;
+                        velocityX = 0.02;
+                        ballPositionX -= (gravity * velocityX * gravityConstantX);
+
+                    }
 
                 }
 
@@ -290,6 +309,12 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
+        if (gameMode == -1) {
+
+            batch.draw(menu, menuDrawingX, menuDrawingY, menuWidth, menuHeight);
+
+        }
+
     }
 
     private void goToMenu() {
@@ -329,8 +354,13 @@ public class BallieRun extends ApplicationAdapter {
 
     private void renderBall(SpriteBatch batch) {
 
-        if (gameMode == 1)
+        if (gameMode == 1
+                || gameMode == -1) {
+
             batch.draw(ball, (int) ballPositionX, (int) ballPositionY, ballSize, ballSize);
+            ballRectangle = new Rectangle((int)ballPositionX, (int)ballPositionY, ballSize, ballSize);
+
+        }
 
         if (isBallForceSide) {
 
@@ -358,6 +388,36 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
+        if (gameMode == -1) {
+
+            // TODO:
+            // Fix collision between ball and menu-image.
+            // Processor can't work too fast.
+            // When ball has high velocity, Intersector can match
+            // collision with menu-ceil, when it must be left wall.
+            // It cause small gui-glitch (ball blink-effect).
+
+            Rectangle leftMenuWall = new Rectangle(menuDrawingX, menuDrawingY, 1, menuHeight);
+            Rectangle upMenuCeil = new Rectangle(menuDrawingX + 16, menuDrawingY + menuHeight + 4, menuWidth, 4);
+
+            if (Intersector.overlaps(upMenuCeil, ballRectangle)) {
+
+                ballPositionY = menuDrawingY + menuHeight + 4;
+                gravityConstant = -1;
+                isBallForceUp = true;
+                velocity = velocity * (1.0 - velocityDivider);
+
+            }
+
+            if (Intersector.overlaps(leftMenuWall, ballRectangle)) {
+
+                ballPositionX = menuDrawingX - ballSize - 4;
+                gravityConstantX = -1;
+
+            }
+
+        }
+
         if (ballPositionX > Gdx.graphics.getWidth() - ballSize) {
 
             ballPositionX = Gdx.graphics.getWidth() - ballSize;
@@ -371,7 +431,6 @@ public class BallieRun extends ApplicationAdapter {
             gravityConstantX = 1;
 
         }
-
 
         if (!isBallForceUp) {
 
@@ -421,11 +480,15 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
-        if (ballPositionX < 48
-                || (ballPositionX + ballSize > Gdx.graphics.getWidth() - 48)
-                || (ballPositionY + ballSize > Gdx.graphics.getHeight() - 16)) {
+        if (gameMode != -1) {
 
-            gameMode = 0;
+            if (ballPositionX < 48
+                    || (ballPositionX + ballSize > Gdx.graphics.getWidth() - 48)
+                    || (ballPositionY + ballSize > Gdx.graphics.getHeight() - 16)) {
+
+                gameMode = 0;
+
+            }
 
         }
 
