@@ -337,7 +337,89 @@ public class BallieRun extends ApplicationAdapter {
 
             setupW800Graphics();
 
+        } else if (Gdx.graphics.getWidth() <= 1280) {
+
+            setupW1280Graphics();
+
         }
+    }
+
+    private void setupW1280Graphics() {
+
+        ballsToHeight = 4;
+        ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
+
+        tileSize /= 1.5;
+        ballSize /= 1.5;
+
+        buttonWidth /= 1.5;
+        buttonHeight /= 1.5;
+
+        menuHeight /= 1.5;
+        menuWidth /= 1.5;
+        menuDrawingX = deviceWidth - menuWidth;
+        menuDrawingY /= 1.5;
+
+        startEasyGameButtonXFromMenu
+                = startHardGameButtonXFromMenu
+                = creditsButtonXFromMenu
+                = aboutAppButtonXFromMenu
+                = quitButtonXFromMenu
+                = menuDrawingX + (int)(25 * 1.5);
+
+        startEasyGameButtonYFromMenu = 490;
+        startHardGameButtonYFromMenu = 540;
+        creditsButtonYFromMenu = 585;
+        aboutAppButtonYFromMenu = 630;
+        quitButtonYFromMenu = 680;
+
+        creditsHeight /= 1.5;
+        creditsWidth /= 1.5;
+
+        aboutGameHeight /= 1.5;
+        aboutGameWidth /= 1.5;
+
+        gameOverHeight /= 1.5;
+        gameOverWidth /= 1.5;
+        gameOverDrawingX = (deviceWidth / 2) - (gameOverWidth / 2);
+        gameOverDrawingY = (deviceHeight / 2) - (gameOverHeight / 2);
+
+        restartButtonXFromGameOver = 165;
+        restartButtonYFromGameOver = 200;
+
+        menuButtonXFromGameOver = 165;
+        menuButtonYFromGameOver = 260;
+
+        quitButtonXFromGameOver = 165;
+        quitButtonYFromGameOver = 325;
+
+        treeSize /= 1.5;
+        vineWidthEnemy /= 1.5;
+        vineHeightEnemy /= 1.5;
+        vineWidth /= 1.5;
+        vineHeight /= 1.5;
+        vineHWidth /= 1.5;
+        vineHHeight /= 1.5;
+
+        font.getData().setScale(fontScale /= 1.5);
+        fontDrawX /= 1.5;
+        fontDrawY /= 1.5;
+
+        sideDeathMargin /= 1.5;
+        upDeathMargin /= 1.5;
+
+        prizeTreeDistanceBetween /= 1.5;
+        treeRectangleOffset /= 1.5;
+
+        vineYOffset1 /= 1.5;
+        vineXOffset1 /= 1.5;
+        vineOffsetValue /= 1.5;
+        menuOffsetValue /= 1.5;
+        treeOffsetValue /= 1.5;
+
+        vineSpeedMultiplier = 8;
+        treeSpeedMultiplier = 8;
+        powerBallSpeedMultiplier = 8;
     }
 
     private void setupW800Graphics() {
