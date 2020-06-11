@@ -1,7 +1,10 @@
 package com.ambiwsstudio.ballierun;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -9,8 +12,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
-
-import org.omg.CosNaming.BindingIterator;
 
 import java.util.ArrayList;
 
@@ -37,6 +38,8 @@ public class BallieRun extends ApplicationAdapter {
     private Rectangle ballRectangle = new Rectangle();
     private Rectangle treeRectangle = new Rectangle();
     private ArrayList<VineEnemy> vineEnemies = new ArrayList<>();
+    private Music forest;
+    private Music ballSound;
 
     /*
         Sizes & Points
@@ -215,6 +218,13 @@ public class BallieRun extends ApplicationAdapter {
         font.setColor(Color.WHITE);
         font.getData().setScale(4);
 
+        forest = Gdx.audio.newMusic(Gdx.files.internal("forest.wav"));
+        forest.setLooping(true);
+        forest.setVolume(0.2f);
+        forest.play();
+
+        ballSound = Gdx.audio.newMusic(Gdx.files.internal("ball.wav"));
+        ballSound.setVolume(0.02f);
     }
 
     private void renderEnvironment(SpriteBatch batch) {
@@ -302,6 +312,9 @@ public class BallieRun extends ApplicationAdapter {
 
                 }
 
+                if (gameMode == 1 || gameMode == 2 || gameMode == -1)
+                    ballSound.play();
+
             }
 
         }
@@ -333,6 +346,7 @@ public class BallieRun extends ApplicationAdapter {
                         vineEnemy.isFloorVine = true;
                         vineEnemies.add(vineEnemy);
                         isVinePreviouslyGenerated = true;
+                        vineGeneratorLockTilesCount = 0;
 
                     } else if (vineRandom >= 0.8) {
 
@@ -340,6 +354,7 @@ public class BallieRun extends ApplicationAdapter {
                         vineEnemy.isFloorVine = false;
                         vineEnemies.add(vineEnemy);
                         isVinePreviouslyGenerated = true;
+                        vineGeneratorLockTilesCount = 0;
 
                     }
 
@@ -347,7 +362,7 @@ public class BallieRun extends ApplicationAdapter {
 
             }
 
-            if (vineGeneratorLockTilesCount >= 4) {
+            if (vineGeneratorLockTilesCount >= 3) {
 
                 vineGeneratorLockTilesCount = 0;
                 isVinePreviouslyGenerated = false;
@@ -837,6 +852,7 @@ public class BallieRun extends ApplicationAdapter {
         tree.dispose();
         damagedTree.dispose();
         font.dispose();
+        forest.dispose();
         System.exit(0);
     }
 }
