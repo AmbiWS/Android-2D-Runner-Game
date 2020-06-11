@@ -118,7 +118,7 @@ public class BallieRun extends ApplicationAdapter {
     private int gravityConstantX = 0;
     private double drawableX = 0;
     private double drawableXEnvironment = 0;
-    private final double speed = 0.5;
+    private double speed = 0.5;
     private int gameMode = -1;
     private int lastGameMode = 0;
     private int treeDamage = 0;
@@ -218,6 +218,9 @@ public class BallieRun extends ApplicationAdapter {
     }
 
     private void renderEnvironment(SpriteBatch batch) {
+
+        speed = 0.5 + (score * 1.0 / 10000);
+        System.out.println(speed);
 
         if (Gdx.input.isTouched()) {
 
@@ -469,10 +472,10 @@ public class BallieRun extends ApplicationAdapter {
 
                 if (velocity == 0) {
 
-                    if (velocityX <= 0.02) {
+                    if (velocityX <= speed / 10) {
 
                         gravityConstantX = 1;
-                        velocityX = 0.02;
+                        velocityX = speed / 10;
                         ballPositionX -= (gravity * velocityX * gravityConstantX);
 
                     }
@@ -640,7 +643,7 @@ public class BallieRun extends ApplicationAdapter {
 
             if (velocity == 0) {
 
-                velocityXMultiplier = 0.03;
+                velocityXMultiplier = speed / 10;
 
             } else {
 
@@ -705,6 +708,7 @@ public class BallieRun extends ApplicationAdapter {
 
                 ballPositionX = treeRectangle.x - ballSize - 8;
                 gravityConstantX = -1;
+                velocityX += (speed * 2);
                 treeDamage++;
 
             }
