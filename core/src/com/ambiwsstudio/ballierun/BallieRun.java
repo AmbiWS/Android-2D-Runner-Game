@@ -2,7 +2,9 @@ package com.ambiwsstudio.ballierun;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
@@ -31,6 +33,7 @@ public class BallieRun extends ApplicationAdapter {
     private Texture aboutGame;
     private Texture tree;
     private Texture damagedTree;
+    private BitmapFont font;
     private Rectangle ballRectangle = new Rectangle();
     private Rectangle treeRectangle = new Rectangle();
     private ArrayList<VineEnemy> vineEnemies = new ArrayList<>();
@@ -115,10 +118,13 @@ public class BallieRun extends ApplicationAdapter {
     private int gravityConstantX = 0;
     private double drawableX = 0;
     private double drawableXEnvironment = 0;
-    private final double speed = 0.2;
+    private final double speed = 0.5;
     private int gameMode = -1;
     private int lastGameMode = 0;
     private int treeDamage = 0;
+    private int vineGeneratorLockTilesCount = 0;
+    private int score = 0;
+    private int scoreMultiplier = 1;
 
     private class VineEnemy {
 
@@ -147,6 +153,7 @@ public class BallieRun extends ApplicationAdapter {
     private boolean isBallForceSide = false;
     private boolean isEnvironmentLifeTileActive = false;
     private boolean isTreeDamaged = false;
+    private boolean isVinePreviouslyGenerated = false;
 
     private void resetGameVariables() {
 
@@ -162,6 +169,12 @@ public class BallieRun extends ApplicationAdapter {
 
         isEnvironmentLifeTileActive = false;
         drawableXEnvironment = 0;
+
+        treeDamage = 0;
+        isTreeDamaged = false;
+
+        score = 0;
+
     }
 
     @Override
@@ -197,6 +210,10 @@ public class BallieRun extends ApplicationAdapter {
         creditsButtonYFromMenu = Gdx.graphics.getHeight() - creditsButtonYFromMenu;
         aboutAppButtonYFromMenu = Gdx.graphics.getHeight() - aboutAppButtonYFromMenu;
         quitButtonYFromMenu = Gdx.graphics.getHeight() - quitButtonYFromMenu;
+
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
+        font.getData().setScale(4);
 
     }
 
@@ -292,6 +309,8 @@ public class BallieRun extends ApplicationAdapter {
         if (drawableX >= tileSize) {
 
             drawableX = 0;
+            vineGeneratorLockTilesCount++;
+            score += (10 * scoreMultiplier);
 
             if (!isEnvironmentLifeTileActive && Math.random() <= 0.2) {
 
@@ -300,23 +319,36 @@ public class BallieRun extends ApplicationAdapter {
 
             }
 
-            if (vineEnemies.size() < 3) {
+            if (!isVinePreviouslyGenerated) {
 
-                double vineRandom = Math.random();
+                if (vineEnemies.size() < 3) {
 
-                if (vineRandom <= 0.2) {
+                    double vineRandom = Math.random();
 
-                    VineEnemy vineEnemy = new VineEnemy();
-                    vineEnemy.isFloorVine = true;
-                    vineEnemies.add(vineEnemy);
+                    if (vineRandom <= 0.2) {
 
-                } else if (vineRandom >= 0.8) {
+                        VineEnemy vineEnemy = new VineEnemy();
+                        vineEnemy.isFloorVine = true;
+                        vineEnemies.add(vineEnemy);
+                        isVinePreviouslyGenerated = true;
 
-                    VineEnemy vineEnemy = new VineEnemy();
-                    vineEnemy.isFloorVine = false;
-                    vineEnemies.add(vineEnemy);
+                    } else if (vineRandom >= 0.8) {
+
+                        VineEnemy vineEnemy = new VineEnemy();
+                        vineEnemy.isFloorVine = false;
+                        vineEnemies.add(vineEnemy);
+                        isVinePreviouslyGenerated = true;
+
+                    }
 
                 }
+
+            }
+
+            if (vineGeneratorLockTilesCount >= 4) {
+
+                vineGeneratorLockTilesCount = 0;
+                isVinePreviouslyGenerated = false;
 
             }
 
@@ -329,7 +361,6 @@ public class BallieRun extends ApplicationAdapter {
                 int currentXEnvironmentPosition = (int) (Gdx.graphics.getWidth() - drawableXEnvironment);
 
                 treeRectangle = new Rectangle((int) (currentXEnvironmentPosition + (treeSize * 1.0 / 3) + 160), 0, (int) (treeSize * 1.0 / 5), Gdx.graphics.getHeight());
-                //drawRectangleOverBatch(batch, (int)(currentXEnvironmentPosition + (treeSize * 1.0 / 3) + 160), 0, (int)(treeSize * 1.0 / 5), Gdx.graphics.getHeight());
 
                 drawableXEnvironment += (speed * 9);
                 Texture currentTree = tree;
@@ -346,6 +377,7 @@ public class BallieRun extends ApplicationAdapter {
                     drawableXEnvironment = 0;
                     isTreeDamaged = false;
                     treeDamage = 0;
+                    score += (200 * scoreMultiplier);
 
                 } else if (isTreeDamaged) {
 
@@ -359,7 +391,6 @@ public class BallieRun extends ApplicationAdapter {
 
             if (vineEnemies.size() > 0) {
 
-                System.out.println(vineEnemies.size());
                 ArrayList<VineEnemy> tempVineEnemies = vineEnemies;
                 int idxToRemove = -1;
 
@@ -371,11 +402,13 @@ public class BallieRun extends ApplicationAdapter {
 
                         currentXVinePosition = (int) (Gdx.graphics.getWidth() - tempVineEnemies.get(i).drawableXEnvironment);
                         batch.draw(vineVertical, currentXVinePosition, (int)(tileSize * 1.0 / 2) - 40, vineWidthEnemy, vineHeightEnemy);
+                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + 90, (int)(tileSize * 1.0 / 2) - 40, vineWidthEnemy - 180, vineHeightEnemy - 30);
 
                     } else {
 
                         currentXVinePosition = (int) (Gdx.graphics.getWidth() - tempVineEnemies.get(i).drawableXEnvironment);
                         batch.draw(vineVerticalReversed, currentXVinePosition, Gdx.graphics.getHeight() - vineHeightEnemy + 40, vineWidthEnemy, vineHeightEnemy);
+                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + 90, Gdx.graphics.getHeight() - vineHeightEnemy + 80, vineWidthEnemy - 180, vineHeightEnemy - 30);
 
                     }
 
@@ -389,8 +422,12 @@ public class BallieRun extends ApplicationAdapter {
 
                 }
 
-                if (idxToRemove != -1)
+                if (idxToRemove != -1) {
+
                     vineEnemies.remove(idxToRemove);
+                    score += (75 * scoreMultiplier);
+
+                }
 
             }
 
@@ -416,6 +453,9 @@ public class BallieRun extends ApplicationAdapter {
             } while (vineI < Gdx.graphics.getHeight());
 
         }
+
+        if (gameMode == 1 || gameMode == 2 || gameMode == 0)
+            font.draw(batch, "Score: " + score, 100, Gdx.graphics.getHeight() - 100);
 
         int i = 0;
         do {
@@ -481,6 +521,7 @@ public class BallieRun extends ApplicationAdapter {
 
                     gameMode = 2;
                     lastGameMode = 2;
+                    scoreMultiplier = 2;
                     resetGameVariables();
 
                 }
@@ -489,6 +530,7 @@ public class BallieRun extends ApplicationAdapter {
 
                     gameMode = 1;
                     lastGameMode = 1;
+                    scoreMultiplier = 3;
                     resetGameVariables();
 
                 }
@@ -675,6 +717,25 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
+        if (vineEnemies.size() > 0) {
+
+            for (VineEnemy enemy: vineEnemies) {
+
+                if (Intersector.overlaps(ballRectangle, enemy.vineRectangle)) {
+
+                    gameMode = 0;
+                    resetGameVariables();
+                    break;
+
+                }
+
+            }
+
+            if (gameMode == 0)
+                vineEnemies.clear();
+
+        }
+
         if (ballPositionX < 0) {
 
             ballPositionX = 0;
@@ -772,6 +833,7 @@ public class BallieRun extends ApplicationAdapter {
         aboutGame.dispose();
         tree.dispose();
         damagedTree.dispose();
+        font.dispose();
         System.exit(0);
     }
 }
