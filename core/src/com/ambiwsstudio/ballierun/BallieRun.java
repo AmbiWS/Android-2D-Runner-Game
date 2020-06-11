@@ -49,25 +49,30 @@ public class BallieRun extends ApplicationAdapter {
     private Music forest;
     private Music ballSound;
     private Timer timer;
-    Preferences prefs;
+    private Preferences prefs;
 
     /*
         Sizes & Points
      */
 
+    private int deviceWidth;
+    private int deviceHeight;
+
     private int tileSize = 256;
     private int ballSize = 128;
-    private double ballPositionY = (tileSize * 1.0) + (ballSize * 5);
-    private double ballPositionX;
-
     private int treeSize = 1200;
+    private int ballsToHeight = 5;
+    private double ballPositionX;
+    private double ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
+    private int sideDeathMargin = 48;
+    private int upDeathMargin = 16;
 
-    private final int vineWidth = 160;
-    private final int vineHeight = 320;
-    private final int vineHWidth = 320;
-    private final int vineHHeight = 160;
-    private final int vineWidthEnemy = 256;
-    private final int vineHeightEnemy = 512;
+    private int vineWidth = 160;
+    private int vineHeight = 320;
+    private int vineHWidth = 320;
+    private int vineHHeight = 160;
+    private int vineWidthEnemy = 256;
+    private int vineHeightEnemy = 512;
 
     private int gameOverHeight = 600;
     private int gameOverWidth = 1000;
@@ -80,22 +85,22 @@ public class BallieRun extends ApplicationAdapter {
     private int aboutGameHeight = 900;
     private int aboutGameWidth = 1200;
 
-    private final int menuWidth = 600;
-    private final int menuHeight = 750;
-    private final int menuDrawingY = -220;
+    private int menuWidth = 600;
+    private int menuHeight = 750;
+    private int menuDrawingY = -220;
     private int menuDrawingX;
 
-    private final int buttonWidth = 500;
-    private final int buttonHeight = 60;
+    private int buttonWidth = 500;
+    private int buttonHeight = 60;
 
-    private final int restartButtonXFromGameOver = 250;
-    private final int restartButtonYFromGameOver = 300;
+    private int restartButtonXFromGameOver = 250;
+    private int restartButtonYFromGameOver = 300;
 
-    private final int menuButtonXFromGameOver = 250;
-    private final int menuButtonYFromGameOver = 390;
+    private int menuButtonXFromGameOver = 250;
+    private int menuButtonYFromGameOver = 390;
 
-    private final int quitButtonXFromGameOver = 250;
-    private final int quitButtonYFromGameOver = 480;
+    private int quitButtonXFromGameOver = 250;
+    private int quitButtonYFromGameOver = 480;
 
     private int startEasyGameButtonYFromMenu = menuDrawingY + menuHeight - 190;
     private int startEasyGameButtonXFromMenu;
@@ -112,17 +117,32 @@ public class BallieRun extends ApplicationAdapter {
     private int quitButtonYFromMenu = menuDrawingY + menuHeight - 470;
     private int quitButtonXFromMenu;
 
+    private float fontScale = 4;
+    private int fontDrawX = 100;
+    private int fontDrawY = 100;
+
     /*
         Game variables (Physics & States)
      */
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int velocityXForceDivider = 75,
+                        velocityForceDivider = 75,
+                        maxVelocity = 10;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final double velocityDivider = 0.3,
+                        speedC = 0.5;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private int pointerXCurrent = 0,
+            pointerYCurrent = 0,
+            pointerDiffX = 0,
+            pointerDiffY = 0;
+
     private final double gravity = 9.8;
     private final double velocityMultiplierConstant = 0.14;
-    private final double velocityDivider = 0.3;
     private final double velocityXMultiplierConstant = 0.01;
-    private final int velocityXForceDivider = 75;
-    private final int velocityForceDivider = 75;
-    private final int maxVelocity = 10;
     private double velocity = 0;
     private double velocityMultiplier = 0.14;
     private int gravityConstant = 1;
@@ -142,6 +162,17 @@ public class BallieRun extends ApplicationAdapter {
     private int scoreMultiplier = 1;
     private int ballMode = 0;
     private int powerBallRandY = 0;
+    private int treeSpeedMultiplier = 9;
+    private int powerBallSpeedMultiplier = 9;
+    private int vineSpeedMultiplier = 9;
+    private int prizeTreeDistanceBetween = 128;
+    private int treeRectangleOffset = 160;
+    private int vineXOffset1 = 90;
+    private int vineYOffset1 = 40;
+    private int vineOffsetValue = 5;
+    private int velocityXSpeedDivider = 10;
+    private int menuOffsetValue = 4;
+    private int treeOffsetValue = 16;
     private String powerBallTip = "";
 
     private static class VineEnemy {
@@ -158,12 +189,6 @@ public class BallieRun extends ApplicationAdapter {
 
     private int pointerXLast = 0;
     private int pointerYLast = 0;
-
-    @SuppressWarnings("FieldCanBeLocal")
-    private int pointerXCurrent = 0,
-            pointerYCurrent = 0,
-            pointerDiffX = 0,
-            pointerDiffY = 0;
 
     private boolean isTouchedOnce = false;
     private boolean isInjectedForce = true;
@@ -208,7 +233,7 @@ public class BallieRun extends ApplicationAdapter {
     private void resetGameVariables() {
 
         ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int) (ballSize * 1.0 / 2);
-        ballPositionY = (tileSize * 1.0) + (ballSize * 5);
+        ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
 
         resetGameCommonVariables();
 
@@ -249,6 +274,9 @@ public class BallieRun extends ApplicationAdapter {
         ballS = new Texture("ballS.png");
         prizeTree = new Texture("Object_16.png");
 
+        deviceHeight = Gdx.graphics.getHeight();
+        deviceWidth = Gdx.graphics.getWidth();
+
         prefs = Gdx.app.getPreferences("My Preferences");
         prefs.remove("ball");
 
@@ -277,33 +305,126 @@ public class BallieRun extends ApplicationAdapter {
         aboutAppButtonYFromMenu = Gdx.graphics.getHeight() - aboutAppButtonYFromMenu;
         quitButtonYFromMenu = Gdx.graphics.getHeight() - quitButtonYFromMenu;
 
+        int menuOffset = 50;
         startEasyGameButtonXFromMenu
                 = startHardGameButtonXFromMenu
                 = creditsButtonXFromMenu
                 = aboutAppButtonXFromMenu
                 = quitButtonXFromMenu
-                = menuDrawingX + 50;
+                = menuDrawingX + menuOffset;
 
         font = new BitmapFont();
         font.setColor(Color.WHITE);
-        font.getData().setScale(4);
+        font.getData().setScale(fontScale);
+
+        float soundVolume = 0.2f;
+        float ballVolume = 0.02f;
 
         forest = Gdx.audio.newMusic(Gdx.files.internal("forest.wav"));
         forest.setLooping(true);
-        forest.setVolume(0.2f);
+
+        forest.setVolume(soundVolume);
         forest.play();
 
         ballSound = Gdx.audio.newMusic(Gdx.files.internal("ball.wav"));
-        ballSound.setVolume(0.02f);
+        ballSound.setVolume(ballVolume);
 
         timer = new Timer();
 
         currentPowerBall = ball;
+
+        if (Gdx.graphics.getWidth() <= 800) {
+
+            setupW800Graphics();
+
+        }
+    }
+
+    private void setupW800Graphics() {
+
+        ballsToHeight = 4;
+        ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
+
+        tileSize /= 2;
+        ballSize /= 2;
+
+        buttonWidth /= 2;
+        buttonHeight /= 2;
+
+        menuHeight /= 2;
+        menuWidth /= 2;
+        menuDrawingX = deviceWidth - menuWidth;
+        menuDrawingY /= 2;
+
+        startEasyGameButtonXFromMenu
+                = startHardGameButtonXFromMenu
+                = creditsButtonXFromMenu
+                = aboutAppButtonXFromMenu
+                = quitButtonXFromMenu
+                = menuDrawingX + 25;
+
+        startEasyGameButtonYFromMenu = 310;
+        startHardGameButtonYFromMenu = 345;
+        creditsButtonYFromMenu = 380;
+        aboutAppButtonYFromMenu = 415;
+        quitButtonYFromMenu = 450;
+
+        creditsHeight /= 2;
+        creditsWidth /= 2;
+
+        aboutGameHeight /= 2;
+        aboutGameWidth /= 2;
+
+        gameOverHeight /= 2;
+        gameOverWidth /= 2;
+        gameOverDrawingX = (deviceWidth / 2) - (gameOverWidth / 2);
+        gameOverDrawingY = (deviceHeight / 2) - (gameOverHeight / 2);
+
+        restartButtonXFromGameOver = 130;
+        restartButtonYFromGameOver = 150;
+
+        menuButtonXFromGameOver = 130;
+        menuButtonYFromGameOver = 195;
+
+        quitButtonXFromGameOver = 130;
+        quitButtonYFromGameOver = 245;
+
+        treeSize /= 2;
+        vineWidthEnemy /= 2;
+        vineHeightEnemy /= 2;
+        vineWidth /= 2;
+        vineHeight /= 2;
+        vineHWidth /= 2;
+        vineHHeight /= 2;
+
+        font.getData().setScale(fontScale /= 2);
+        fontDrawX /= 2;
+        fontDrawY /= 2;
+
+        sideDeathMargin /= 2;
+        upDeathMargin /= 2;
+
+        prizeTreeDistanceBetween /= 2;
+        treeRectangleOffset /= 2;
+
+        vineYOffset1 /= 2;
+        vineXOffset1 /= 2;
+        vineOffsetValue /= 2;
+        menuOffsetValue /= 2;
+        treeOffsetValue /= 2;
+
+        vineSpeedMultiplier = 8;
+        treeSpeedMultiplier = 8;
+        powerBallSpeedMultiplier = 8;
+
     }
 
     private void renderEnvironment(SpriteBatch batch) {
 
-        if (gameMode == 2 && score >= 20000) {
+        float winTimerDelay = 15f;
+        int maxScoreToWinEasyMode = 20000;
+        int maxScoreToWinHardMode = 30000;
+        if (gameMode == 2 && score >= maxScoreToWinEasyMode) {
 
             if (!prefs.getString("ball", "D").equals("S")) {
 
@@ -331,11 +452,11 @@ public class BallieRun extends ApplicationAdapter {
                         timer = new Timer();
 
                     }
-                }, 15f);
+                }, winTimerDelay);
 
             }
 
-        } else if (gameMode == 1 && score >= 30000) {
+        } else if (gameMode == 1 && score >= maxScoreToWinHardMode) {
 
             prefs.putString("ball", "S");
             prefs.flush();
@@ -361,13 +482,14 @@ public class BallieRun extends ApplicationAdapter {
                     timer = new Timer();
 
                 }
-            }, 15f);
+            }, winTimerDelay);
 
         }
 
         if (ballMode != 3) {
 
-            speed = 0.5 + (score * 1.0 / 10000);
+            int scoreToSpeedDivider = 10000;
+            speed = speedC + (score * 1.0 / scoreToSpeedDivider);
 
         }
 
@@ -488,17 +610,17 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
-        batch.draw(background, 0, 0);
+        batch.draw(background, 0, 0, deviceWidth, deviceHeight);
 
         if (ballMode == 3) {
 
-            speed = 1;
+            speed = speedC * 2;
             int currentXPrizeTreePosition = (int) (Gdx.graphics.getWidth() - drawableXPrizeTree);
-            drawableXPrizeTree += (speed * 9);
+            drawableXPrizeTree += (speed * treeSpeedMultiplier);
 
             for (int i = 0; i < 3; i++) {
 
-                batch.draw(prizeTree, currentXPrizeTreePosition + (i * treeSize + 128), (int) (tileSize * 1.0 / 2), treeSize, treeSize);
+                batch.draw(prizeTree, currentXPrizeTreePosition + (i * treeSize + prizeTreeDistanceBetween), (int) (tileSize * 1.0 / 2), treeSize, treeSize);
 
             }
 
@@ -508,29 +630,33 @@ public class BallieRun extends ApplicationAdapter {
 
             drawableX = 0;
             vineGeneratorLockTilesCount++;
-            score += (10 * scoreMultiplier);
+            int scoreC = 10;
+            score += (scoreC * scoreMultiplier);
 
             if (!isPowerBallTileActive) {
 
                 double powerBallRandom = Math.random();
 
+                // Ball TP spawn - 2.5%
+                // Ball Power spawn - 2.5%
                 if (powerBallRandom <= 0.025) {
 
                     isPowerBallTileActive = true;
                     drawableXPowerBall = 0;
                     currentPowerBall = powerBallP;
-                    powerBallRandY = (int) (Math.random() * 900) + (tileSize / 2);
+                    powerBallRandY = (int) (Math.random() * (deviceHeight - tileSize)) + (tileSize / 2);
 
                 } else if (powerBallRandom >= 0.975) {
 
                     isPowerBallTileActive = true;
                     drawableXPowerBall = 0;
                     currentPowerBall = powerBallT;
-                    powerBallRandY = (int) (Math.random() * 900) + (tileSize / 2);
+                    powerBallRandY = (int) (Math.random() * (deviceHeight - tileSize)) + (tileSize / 2);
 
                 }
             }
 
+            // Tree spawn - 20%
             if (!isEnvironmentLifeTileActive && Math.random() <= 0.2) {
 
                 isEnvironmentLifeTileActive = true;
@@ -544,6 +670,8 @@ public class BallieRun extends ApplicationAdapter {
 
                     double vineRandom = Math.random();
 
+                    // Vine spawn bottom - 20%
+                    // Vine spawn top - 20%
                     if (vineRandom <= 0.2) {
 
                         VineEnemy vineEnemy = new VineEnemy();
@@ -581,11 +709,12 @@ public class BallieRun extends ApplicationAdapter {
 
                 int currentXEnvironmentPosition = (int) (Gdx.graphics.getWidth() - drawableXEnvironment);
 
-                treeRectangle = new Rectangle((int) (currentXEnvironmentPosition + (treeSize * 1.0 / 3) + 160), 0, (int) (treeSize * 1.0 / 5), Gdx.graphics.getHeight());
+                treeRectangle = new Rectangle((int) (currentXEnvironmentPosition + (treeSize * 1.0 / 3) + treeRectangleOffset), 0, (int) (treeSize * 1.0 / 5), Gdx.graphics.getHeight());
 
-                drawableXEnvironment += (speed * 9);
+                drawableXEnvironment += (speed * treeSpeedMultiplier);
                 Texture currentTree = tree;
 
+                int treeScoreReward = 200;
                 if (currentXEnvironmentPosition < -(treeSize / 3) && !isTreeDamaged && ballPositionX > currentXEnvironmentPosition
                         && ballPositionX < (currentXEnvironmentPosition + treeSize - (treeSize * 1.0 / 3))) {
 
@@ -600,7 +729,7 @@ public class BallieRun extends ApplicationAdapter {
                     drawableXEnvironment = 0;
                     isTreeDamaged = false;
                     treeDamage = 0;
-                    score += (200 * scoreMultiplier);
+                    score += (treeScoreReward * scoreMultiplier);
 
                 } else if (isTreeDamaged) {
 
@@ -612,7 +741,7 @@ public class BallieRun extends ApplicationAdapter {
                     drawableXEnvironment = 0;
                     isTreeDamaged = false;
                     treeDamage = 0;
-                    score += (200 * scoreMultiplier);
+                    score += (treeScoreReward * scoreMultiplier);
 
                 }
 
@@ -626,7 +755,7 @@ public class BallieRun extends ApplicationAdapter {
 
                 powerBallRectangle = new Rectangle(currentXPowerBallPosition, powerBallRandY, (int) (ballSize * 1.0 / 2), (int) (ballSize * 1.0 / 2));
 
-                drawableXPowerBall += (speed * 9);
+                drawableXPowerBall += (speed * powerBallSpeedMultiplier);
                 batch.draw(currentPowerBall, currentXPowerBallPosition, powerBallRandY, (int) (ballSize * 1.0 / 2), (int) (ballSize * 1.0 / 2));
 
                 if (currentXPowerBallPosition + (int) (ballSize * 1.0 / 2) < 0) {
@@ -639,7 +768,7 @@ public class BallieRun extends ApplicationAdapter {
             } else if (ballMode != 0) {
 
                 isPowerBallTileActive = true;
-                drawableXPowerBall = -ball.getWidth();
+                drawableXPowerBall = -ballSize;
 
             }
 
@@ -655,18 +784,18 @@ public class BallieRun extends ApplicationAdapter {
                     if (tempVineEnemies.get(i).isFloorVine) {
 
                         currentXVinePosition = (int) (Gdx.graphics.getWidth() - tempVineEnemies.get(i).drawableXEnvironment);
-                        batch.draw(vineVertical, currentXVinePosition, (int) (tileSize * 1.0 / 2) - 40, vineWidthEnemy, vineHeightEnemy);
-                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + 90, (int) (tileSize * 1.0 / 2) - 40, vineWidthEnemy - 180, vineHeightEnemy - 30);
+                        batch.draw(vineVertical, currentXVinePosition, (int) (tileSize * 1.0 / 2) - vineYOffset1, vineWidthEnemy, vineHeightEnemy);
+                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + vineXOffset1, (int) (tileSize * 1.0 / 2) - vineYOffset1, vineWidthEnemy - (vineXOffset1 * 2), vineHeightEnemy - (int)(vineXOffset1 * 1.0 / 3));
 
                     } else {
 
                         currentXVinePosition = (int) (Gdx.graphics.getWidth() - tempVineEnemies.get(i).drawableXEnvironment);
-                        batch.draw(vineVerticalReversed, currentXVinePosition, Gdx.graphics.getHeight() - vineHeightEnemy + 40, vineWidthEnemy, vineHeightEnemy);
-                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + 90, Gdx.graphics.getHeight() - vineHeightEnemy + 80, vineWidthEnemy - 180, vineHeightEnemy - 30);
+                        batch.draw(vineVerticalReversed, currentXVinePosition, Gdx.graphics.getHeight() - vineHeightEnemy + vineYOffset1, vineWidthEnemy, vineHeightEnemy);
+                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + vineXOffset1, Gdx.graphics.getHeight() - vineHeightEnemy + (vineYOffset1 * 2), vineWidthEnemy - (vineXOffset1 * 2), vineHeightEnemy - (int)(vineXOffset1 * 1.0 / 3));
 
                     }
 
-                    tempVineEnemies.get(i).drawableXEnvironment += (speed * 9);
+                    tempVineEnemies.get(i).drawableXEnvironment += (speed * vineSpeedMultiplier);
 
                     if (currentXVinePosition < -vineWidthEnemy) {
 
@@ -679,7 +808,8 @@ public class BallieRun extends ApplicationAdapter {
                 if (idxToRemove != -1) {
 
                     vineEnemies.remove(idxToRemove);
-                    score += (75 * scoreMultiplier);
+                    int vineScoreReward = 75;
+                    score += (vineScoreReward * scoreMultiplier);
 
                 }
 
@@ -692,17 +822,17 @@ public class BallieRun extends ApplicationAdapter {
             int vineHorI = 0;
             do {
 
-                batch.draw(vineHorizontal, vineHorI, Gdx.graphics.getHeight() - (int) (vineHHeight * 1.0 / 2) + 5, vineHWidth, vineHHeight);
-                vineHorI += vineHWidth - 20;
+                batch.draw(vineHorizontal, vineHorI, Gdx.graphics.getHeight() - (int) (vineHHeight * 1.0 / 2) + vineOffsetValue, vineHWidth, vineHHeight);
+                vineHorI += vineHWidth - (vineOffsetValue * 4);
 
             } while (vineHorI < Gdx.graphics.getWidth());
 
             int vineI = 0;
             do {
 
-                batch.draw(vineVertical, 0 - (int) (vineWidth * 1.0 / 3) - 10, vineI, vineWidth, vineHeight);
-                batch.draw(vineVerticalReversed, Gdx.graphics.getWidth() - (int) (vineWidth * 1.0 / 2) - 15, vineI, vineWidth, vineHeight);
-                vineI += vineHeight - 30;
+                batch.draw(vineVertical, 0 - (int) (vineWidth * 1.0 / 3) - (vineOffsetValue * 2), vineI, vineWidth, vineHeight);
+                batch.draw(vineVerticalReversed, Gdx.graphics.getWidth() - (int) (vineWidth * 1.0 / 2) - (vineOffsetValue * 3), vineI, vineWidth, vineHeight);
+                vineI += vineHeight - (vineOffsetValue * 6);
 
             } while (vineI < Gdx.graphics.getHeight());
 
@@ -712,15 +842,15 @@ public class BallieRun extends ApplicationAdapter {
 
             if (ballMode != 3) {
 
-                font.draw(batch, "Score: " + score, 100, Gdx.graphics.getHeight() - 100);
+                font.draw(batch, "Score: " + score, fontDrawX, Gdx.graphics.getHeight() - fontDrawY);
 
             } else {
 
-                font.draw(batch, "Score: ---", 100, Gdx.graphics.getHeight() - 100);
+                font.draw(batch, "Score: ---", fontDrawX, Gdx.graphics.getHeight() - fontDrawY);
 
             }
 
-            font.draw(batch, powerBallTip, 100, Gdx.graphics.getHeight() - 200);
+            font.draw(batch, powerBallTip, fontDrawX, Gdx.graphics.getHeight() - (fontDrawY * 2));
         }
 
         int i = 0;
@@ -735,10 +865,10 @@ public class BallieRun extends ApplicationAdapter {
 
                 if (velocity == 0) {
 
-                    if (velocityX <= speed / 10) {
+                    if (velocityX <= speed / velocityXSpeedDivider) {
 
                         gravityConstantX = 1;
-                        velocityX = speed / 10;
+                        velocityX = speed / velocityXSpeedDivider;
                         ballPositionX -= (gravity * velocityX * gravityConstantX);
 
                     }
@@ -756,6 +886,9 @@ public class BallieRun extends ApplicationAdapter {
             batch.draw(gameOver, gameOverDrawingX, gameOverDrawingY, gameOverWidth, gameOverHeight);
 
         }
+
+        //  function to test for adaptive design
+        //  drawRectangleOverBatch(batch, gameOverDrawingX + menuButtonXFromGameOver, deviceHeight - (gameOverDrawingY + menuButtonYFromGameOver), buttonWidth, buttonHeight);
 
         if (Gdx.input.justTouched()) {
 
@@ -905,6 +1038,7 @@ public class BallieRun extends ApplicationAdapter {
 
                     ball = currentPowerBall;
 
+                    float powerBallTimer = 15f;
                     if (currentPowerBall.equals(powerBallP)) {
 
                         ballMode = 1;
@@ -920,7 +1054,7 @@ public class BallieRun extends ApplicationAdapter {
                                 timer = new Timer();
 
                             }
-                        }, 15f);
+                        }, powerBallTimer);
 
                     } else if (currentPowerBall.equals(powerBallT)) {
 
@@ -936,7 +1070,7 @@ public class BallieRun extends ApplicationAdapter {
                                 timer = new Timer();
 
                             }
-                        }, 15f);
+                        }, powerBallTimer);
 
                     }
 
@@ -952,7 +1086,7 @@ public class BallieRun extends ApplicationAdapter {
 
             if (velocity == 0) {
 
-                velocityXMultiplier = speed / 10;
+                velocityXMultiplier = speed / velocityXSpeedDivider;
 
             } else {
 
@@ -977,11 +1111,11 @@ public class BallieRun extends ApplicationAdapter {
         if (gameMode == -1) {
 
             Rectangle leftMenuWall = new Rectangle(menuDrawingX, menuDrawingY, 1, menuHeight);
-            Rectangle upMenuCeil = new Rectangle(menuDrawingX + 16, menuDrawingY + menuHeight + 4, menuWidth, 4);
+            Rectangle upMenuCeil = new Rectangle(menuDrawingX + (menuOffsetValue * 4), menuDrawingY + menuHeight + menuOffsetValue, menuWidth, menuOffsetValue);
 
             if (Intersector.overlaps(upMenuCeil, ballRectangle)) {
 
-                ballPositionY = menuDrawingY + menuHeight + 4;
+                ballPositionY = menuDrawingY + menuHeight + (menuOffsetValue);
                 gravityConstant = -1;
                 isBallForceUp = true;
                 velocity = velocity * (1.0 - velocityDivider);
@@ -990,7 +1124,7 @@ public class BallieRun extends ApplicationAdapter {
 
             if (Intersector.overlaps(leftMenuWall, ballRectangle)) {
 
-                ballPositionX = menuDrawingX - ballSize - 4;
+                ballPositionX = menuDrawingX - ballSize - (menuOffsetValue);
                 gravityConstantX = -1;
 
             }
@@ -1006,6 +1140,7 @@ public class BallieRun extends ApplicationAdapter {
 
         if (isEnvironmentLifeTileActive && ballMode != -3) {
 
+            int treeDamageToKill = 10;
             if (!isTreeDamaged && Intersector.overlaps(ballRectangle, treeRectangle)) {
 
                 if (ballMode == 2) {
@@ -1018,20 +1153,19 @@ public class BallieRun extends ApplicationAdapter {
                 } else if (ballMode == 1) {
 
                     isTreeDamaged = true;
-                    treeDamage = 10;
+                    treeDamage = treeDamageToKill;
 
                 } else {
 
-                    ballPositionX = treeRectangle.x - ballSize - 16;
+                    ballPositionX = treeRectangle.x - ballSize - treeOffsetValue;
                     gravityConstantX = -1;
-                    //velocityX += (speed * 2);
                     treeDamage++;
 
                 }
 
             }
 
-            if (treeDamage >= 10) {
+            if (treeDamage >= treeDamageToKill) {
 
                 isTreeDamaged = true;
 
@@ -1119,9 +1253,9 @@ public class BallieRun extends ApplicationAdapter {
 
         if (gameMode != -1 && gameMode != 2 && gameMode != 3 && gameMode != 4 && ballMode != -3) {
 
-            if (ballPositionX < 48
-                    || (ballPositionX + ballSize > Gdx.graphics.getWidth() - 48)
-                    || (ballPositionY + ballSize > Gdx.graphics.getHeight() - 16)) {
+            if (ballPositionX < sideDeathMargin
+                    || (ballPositionX + ballSize > Gdx.graphics.getWidth() - sideDeathMargin)
+                    || (ballPositionY + ballSize > Gdx.graphics.getHeight() - upDeathMargin)) {
 
                 gameMode = 0;
                 resetGameVariables();
