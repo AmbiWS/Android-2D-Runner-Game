@@ -25,7 +25,10 @@ public class BallieRun extends ApplicationAdapter {
     private Texture menu;
     private Texture credits;
     private Texture aboutGame;
+    private Texture tree;
+    private Texture damagedTree;
     private Rectangle ballRectangle = new Rectangle();
+    private Rectangle treeRectangle = new Rectangle();
 
     /*
         Sizes & Points
@@ -35,6 +38,8 @@ public class BallieRun extends ApplicationAdapter {
     private int ballSize = 128;
     private double ballPositionY = (tileSize * 1.0) + (ballSize * 5);
     private double ballPositionX;
+
+    private int treeSize = 1200;
 
     private final int vineWidth = 160;
     private final int vineHeight = 320;
@@ -102,8 +107,12 @@ public class BallieRun extends ApplicationAdapter {
     private double velocityXMultiplier = 0.01;
     private int gravityConstantX = 0;
     private double drawableX = 0;
+    private double drawableXEnvironment = 0;
     private final double speed = 0.2;
     private int gameMode = -1;
+    private int environmentLifeTileIndex = 0;
+    private int lastGameMode = 0;
+    private int treeDamage = 0;
 
     /*
         User-input variables & Booleans
@@ -122,6 +131,8 @@ public class BallieRun extends ApplicationAdapter {
     private boolean isInjectedForce = true;
     private boolean isBallForceUp = false;
     private boolean isBallForceSide = false;
+    private boolean isEnvironmentLifeTileActive = false;
+    private boolean isTreeDamaged = false;
 
     private void resetGameVariables() {
 
@@ -135,6 +146,8 @@ public class BallieRun extends ApplicationAdapter {
         velocityXMultiplier = velocityXMultiplierConstant;
         gravityConstantX = 0;
 
+        isEnvironmentLifeTileActive = false;
+        drawableXEnvironment = 0;
     }
 
     @Override
@@ -150,6 +163,8 @@ public class BallieRun extends ApplicationAdapter {
         menu = new Texture("menu.png");
         credits = new Texture("credits.png");
         aboutGame = new Texture("aboutgame.png");
+        tree = new Texture("Object_17.png");
+        damagedTree = new Texture("Object_17d.png");
 
         ballPositionX = Gdx.graphics.getWidth() * 1.0 / 2 - (int)(ballSize * 1.0 / 2);
         gameOverDrawingX = (int) ((Gdx.graphics.getWidth() * 1.0 / 2) - gameOverWidth / 2);
@@ -260,7 +275,57 @@ public class BallieRun extends ApplicationAdapter {
 
         batch.draw(background, 0, 0);
 
-        if (gameMode != -1 && gameMode != 2 && gameMode != 3 && gameMode != 4) {
+        if (drawableX >= tileSize) {
+
+            drawableX = 0;
+
+            if (!isEnvironmentLifeTileActive && Math.random() <= 1) {
+
+                isEnvironmentLifeTileActive = true;
+                drawableXEnvironment = 0;
+
+            }
+
+        }
+
+        if (gameMode != 0) {
+
+            if (isEnvironmentLifeTileActive) {
+
+                int currentXEnvironmentPosition = (int) (Gdx.graphics.getWidth() - drawableXEnvironment);
+
+                treeRectangle = new Rectangle((int) (currentXEnvironmentPosition + (treeSize * 1.0 / 3) + 160), 0, (int) (treeSize * 1.0 / 5), Gdx.graphics.getHeight());
+                //drawRectangleOverBatch(batch, (int)(currentXEnvironmentPosition + (treeSize * 1.0 / 3) + 160), 0, (int)(treeSize * 1.0 / 5), Gdx.graphics.getHeight());
+
+                drawableXEnvironment += (speed * 9);
+                Texture currentTree = tree;
+
+                if (currentXEnvironmentPosition < 0 && !isTreeDamaged) {
+
+                    isEnvironmentLifeTileActive = false;
+                    drawableXEnvironment = 0;
+                    gameMode = 0;
+
+                } else if (isTreeDamaged && currentXEnvironmentPosition < -treeSize) {
+
+                    isEnvironmentLifeTileActive = false;
+                    drawableXEnvironment = 0;
+                    isTreeDamaged = false;
+                    treeDamage = 0;
+
+                } else if (isTreeDamaged) {
+
+                    currentTree = damagedTree;
+
+                }
+
+                batch.draw(currentTree, currentXEnvironmentPosition, (int) (tileSize * 1.0 / 2), treeSize, treeSize);
+
+            }
+
+        }
+
+        if (gameMode != -1 && gameMode != 2 && gameMode != 3 && gameMode != 4 && lastGameMode != 2) {
 
             int vineHorI = 0;
             do {
@@ -280,10 +345,6 @@ public class BallieRun extends ApplicationAdapter {
             } while (vineI < Gdx.graphics.getHeight());
 
         }
-
-
-        if (drawableX >= tileSize)
-            drawableX = 0;
 
         int i = 0;
         do {
@@ -325,7 +386,7 @@ public class BallieRun extends ApplicationAdapter {
 
                 if (isBtnClicked(restartButtonXFromGameOver, restartButtonYFromGameOver, gameOverDrawingX, gameOverDrawingY)) {
 
-                    gameMode = 1;
+                    gameMode = lastGameMode;
                     resetGameVariables();
 
                 }
@@ -348,6 +409,7 @@ public class BallieRun extends ApplicationAdapter {
                 if (isBtnClicked(startEasyGameButtonXFromMenu, startEasyGameButtonYFromMenu)) {
 
                     gameMode = 2;
+                    lastGameMode = 2;
                     resetGameVariables();
 
                 }
@@ -355,6 +417,7 @@ public class BallieRun extends ApplicationAdapter {
                 if (isBtnClicked(startHardGameButtonXFromMenu, startHardGameButtonYFromMenu)) {
 
                     gameMode = 1;
+                    lastGameMode = 1;
                     resetGameVariables();
 
                 }
@@ -523,6 +586,24 @@ public class BallieRun extends ApplicationAdapter {
 
         }
 
+        if (isEnvironmentLifeTileActive) {
+
+            if (!isTreeDamaged && Intersector.overlaps(ballRectangle, treeRectangle)) {
+
+                ballPositionX = treeRectangle.x - ballSize - 8;
+                gravityConstantX = -1;
+                treeDamage++;
+
+            }
+
+            if (treeDamage >= 10) {
+
+                isTreeDamaged = true;
+
+            }
+
+        }
+
         if (ballPositionX < 0) {
 
             ballPositionX = 0;
@@ -618,6 +699,8 @@ public class BallieRun extends ApplicationAdapter {
         credits.dispose();
         background.dispose();
         aboutGame.dispose();
+        tree.dispose();
+        damagedTree.dispose();
         System.exit(0);
     }
 }
