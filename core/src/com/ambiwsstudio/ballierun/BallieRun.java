@@ -240,7 +240,6 @@ public class BallieRun extends ApplicationAdapter {
 
         drawableXEnvironment = 0;
         treeDamage = 0;
-        score = 0;
         drawableX = 0;
         speed = 0.5;
         vineGeneratorLockTilesCount = 0;
@@ -1179,6 +1178,7 @@ public class BallieRun extends ApplicationAdapter {
 
                     gameMode = lastGameMode;
                     resetGameVariables();
+                    score = 0;
 
                 }
 
@@ -1186,6 +1186,7 @@ public class BallieRun extends ApplicationAdapter {
 
                     gameMode = -1;
                     resetGameVariables();
+                    score = 0;
 
                 }
 
@@ -1203,6 +1204,7 @@ public class BallieRun extends ApplicationAdapter {
                     lastGameMode = 2;
                     scoreMultiplier = 2;
                     resetGameVariables();
+                    score = 0;
 
                 }
 
@@ -1212,6 +1214,7 @@ public class BallieRun extends ApplicationAdapter {
                     lastGameMode = 1;
                     scoreMultiplier = 3;
                     resetGameVariables();
+                    score = 0;
 
                 }
 
