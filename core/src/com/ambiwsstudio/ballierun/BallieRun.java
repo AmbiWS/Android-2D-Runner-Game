@@ -127,12 +127,12 @@ public class BallieRun extends ApplicationAdapter {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final int velocityXForceDivider = 75,
-                        velocityForceDivider = 75,
-                        maxVelocity = 10;
+            velocityForceDivider = 75,
+            maxVelocity = 10;
 
     @SuppressWarnings("FieldCanBeLocal")
     private final double velocityDivider = 0.3,
-                        speedC = 0.5;
+            speedC = 0.5;
 
     @SuppressWarnings("FieldCanBeLocal")
     private int pointerXCurrent = 0,
@@ -334,6 +334,10 @@ public class BallieRun extends ApplicationAdapter {
 
             setupW1280Graphics();
 
+        } else if (Gdx.graphics.getWidth() <= 1520) {
+
+            setupW1520Graphics();
+
         } else if (Gdx.graphics.getWidth() <= 1920) {
 
             setupW1920Graphics();
@@ -349,10 +353,91 @@ public class BallieRun extends ApplicationAdapter {
         }
     }
 
+    private void setupW1520Graphics() {
+
+        ballsToHeight = 4;
+        ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
+        ballPositionX = (deviceWidth * 1.0 / 2) - (ballSize * 1.0 / 2);
+
+        tileSize /= 1.4;
+        ballSize /= 1.4;
+
+        buttonWidth /= 1.4;
+        buttonHeight /= 1.4;
+
+        menuHeight /= 1.4;
+        menuWidth /= 1.4;
+        menuDrawingX = deviceWidth - menuWidth;
+        menuDrawingY /= 1.4;
+
+        startEasyGameButtonXFromMenu
+                = startHardGameButtonXFromMenu
+                = creditsButtonXFromMenu
+                = aboutAppButtonXFromMenu
+                = quitButtonXFromMenu
+                = menuDrawingX + (int) ((menuOffset / 2) * 1.4);
+
+        startEasyGameButtonYFromMenu = 475;
+        startHardGameButtonYFromMenu = 525;
+        creditsButtonYFromMenu = 575;
+        aboutAppButtonYFromMenu = 625;
+        quitButtonYFromMenu = 675;
+
+        creditsHeight /= 1.4;
+        creditsWidth /= 1.4;
+
+        aboutGameHeight /= 1.4;
+        aboutGameWidth /= 1.4;
+
+        gameOverHeight /= 1.4;
+        gameOverWidth /= 1.4;
+        gameOverDrawingX = (deviceWidth / 2) - (gameOverWidth / 2);
+        gameOverDrawingY = (deviceHeight / 2) - (gameOverHeight / 2);
+
+        restartButtonXFromGameOver = 180;
+        restartButtonYFromGameOver = 210;
+
+        menuButtonXFromGameOver = 180;
+        menuButtonYFromGameOver = 280;
+
+        quitButtonXFromGameOver = 180;
+        quitButtonYFromGameOver = 350;
+
+        treeSize /= 1.4;
+        vineWidthEnemy /= 1.4;
+        vineHeightEnemy /= 1.4;
+        vineWidth /= 1.4;
+        vineHeight /= 1.4;
+        vineHWidth /= 1.4;
+        vineHHeight /= 1.4;
+
+        font.getData().setScale(fontScale /= 1.4);
+        fontDrawX /= 1.4;
+        fontDrawY /= 1.4;
+
+        sideDeathMargin /= 1.4;
+        upDeathMargin /= 1.4;
+
+        prizeTreeDistanceBetween /= 1.4;
+        treeRectangleOffset /= 1.4;
+
+        vineYOffset1 /= 1.4;
+        vineXOffset1 /= 1.4;
+        vineOffsetValue /= 1.4;
+        menuOffsetValue /= 1.4;
+        treeOffsetValue /= 1.4;
+
+        vineSpeedMultiplier = 9;
+        treeSpeedMultiplier = 9;
+        powerBallSpeedMultiplier = 9;
+
+    }
+
     private void setupW2560Graphics() {
 
         ballsToHeight = 4;
         ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
+        ballPositionX = (deviceWidth * 1.0 / 2) - (ballSize * 1.0 / 2);
 
         tileSize *= 1.5;
         ballSize *= 1.5;
@@ -370,7 +455,7 @@ public class BallieRun extends ApplicationAdapter {
                 = creditsButtonXFromMenu
                 = aboutAppButtonXFromMenu
                 = quitButtonXFromMenu
-                = menuDrawingX + (int)(menuOffset * 1.5);
+                = menuDrawingX + (int) (menuOffset * 1.5);
 
         startEasyGameButtonYFromMenu = 925;
         startHardGameButtonYFromMenu = 1030;
@@ -425,7 +510,6 @@ public class BallieRun extends ApplicationAdapter {
         vineSpeedMultiplier = 8;
         treeSpeedMultiplier = 8;
         powerBallSpeedMultiplier = 8;
-
     }
 
     private void setupW1920Graphics() {
@@ -458,6 +542,7 @@ public class BallieRun extends ApplicationAdapter {
 
         ballsToHeight = 4;
         ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
+        ballPositionX = (deviceWidth * 1.0 / 2) - (ballSize * 1.0 / 2);
 
         tileSize /= 1.5;
         ballSize /= 1.5;
@@ -475,7 +560,7 @@ public class BallieRun extends ApplicationAdapter {
                 = creditsButtonXFromMenu
                 = aboutAppButtonXFromMenu
                 = quitButtonXFromMenu
-                = menuDrawingX + (int)((menuOffset / 2) * 1.5);
+                = menuDrawingX + (int) ((menuOffset / 2) * 1.5);
 
         startEasyGameButtonYFromMenu = 490;
         startHardGameButtonYFromMenu = 540;
@@ -536,6 +621,7 @@ public class BallieRun extends ApplicationAdapter {
 
         ballsToHeight = 4;
         ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
+        ballPositionX = (deviceWidth * 1.0 / 2) - (ballSize * 1.0 / 2);
 
         tileSize /= 2;
         ballSize /= 2;
@@ -977,13 +1063,13 @@ public class BallieRun extends ApplicationAdapter {
 
                         currentXVinePosition = (int) (Gdx.graphics.getWidth() - tempVineEnemies.get(i).drawableXEnvironment);
                         batch.draw(vineVertical, currentXVinePosition, (int) (tileSize * 1.0 / 2) - vineYOffset1, vineWidthEnemy, vineHeightEnemy);
-                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + vineXOffset1, (int) (tileSize * 1.0 / 2) - vineYOffset1, vineWidthEnemy - (vineXOffset1 * 2), vineHeightEnemy - (int)(vineXOffset1 * 1.0 / 3));
+                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + vineXOffset1, (int) (tileSize * 1.0 / 2) - vineYOffset1, vineWidthEnemy - (vineXOffset1 * 2), vineHeightEnemy - (int) (vineXOffset1 * 1.0 / 3));
 
                     } else {
 
                         currentXVinePosition = (int) (Gdx.graphics.getWidth() - tempVineEnemies.get(i).drawableXEnvironment);
                         batch.draw(vineVerticalReversed, currentXVinePosition, Gdx.graphics.getHeight() - vineHeightEnemy + vineYOffset1, vineWidthEnemy, vineHeightEnemy);
-                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + vineXOffset1, Gdx.graphics.getHeight() - vineHeightEnemy + (vineYOffset1 * 2), vineWidthEnemy - (vineXOffset1 * 2), vineHeightEnemy - (int)(vineXOffset1 * 1.0 / 3));
+                        vineEnemies.get(i).vineRectangle = new Rectangle(currentXVinePosition + vineXOffset1, Gdx.graphics.getHeight() - vineHeightEnemy + (vineYOffset1 * 2), vineWidthEnemy - (vineXOffset1 * 2), vineHeightEnemy - (int) (vineXOffset1 * 1.0 / 3));
 
                     }
 
