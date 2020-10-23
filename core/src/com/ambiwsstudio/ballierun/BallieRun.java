@@ -698,7 +698,7 @@ public class BallieRun extends ApplicationAdapter {
     }
 
     private void renderEnvironment(SpriteBatch batch) {
-
+        //ss
         float winTimerDelay = 15f;
         int maxScoreToWinEasyMode = 20000;
         int maxScoreToWinHardMode = 30000;
