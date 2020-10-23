@@ -327,23 +327,31 @@ public class BallieRun extends ApplicationAdapter {
 
         if (Gdx.graphics.getWidth() <= 800) {
 
-            setupW800Graphics();
+            setupGraphics(8, 2,
+                    new int[]{310, 345, 380, 415, 450},
+                    new int[]{130, 150, 195, 245});
 
         } else if (Gdx.graphics.getWidth() <= 1280) {
 
-            setupW1280Graphics();
+            setupGraphics(8, 1.5,
+                    new int[]{490, 540, 585, 630, 680},
+                    new int[]{165, 200, 260, 325});
 
         } else if (Gdx.graphics.getWidth() <= 1520) {
 
-            setupW1520Graphics();
+            setupGraphics(9, 1.4,
+                    new int[]{475, 525, 575, 625, 675},
+                    new int[]{180, 210, 280, 350});
 
         } else if (Gdx.graphics.getWidth() <= 1920) {
 
-            setupW1920Graphics();
+            setupGraphics();
 
         } else if (Gdx.graphics.getWidth() <= 2560) {
 
-            setupW2560Graphics();
+            setupGraphics(8, 0.6666,
+                    new int[] {925, 1030, 1135, 1240, 1375},
+                    new int[] {370, 460, 590, 730});
 
         } else {
 
@@ -352,166 +360,87 @@ public class BallieRun extends ApplicationAdapter {
         }
     }
 
-    private void setupW1520Graphics() {
+    private void setupGraphics(int speedW, double multiplierW, int[] mMenuW, int[] sMenuW) {
 
         ballsToHeight = 4;
         ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
         ballPositionX = (deviceWidth * 1.0 / 2) - (ballSize * 1.0 / 2);
 
-        tileSize /= 1.4;
-        ballSize /= 1.4;
+        tileSize /= multiplierW;
+        ballSize /= multiplierW;
 
-        buttonWidth /= 1.4;
-        buttonHeight /= 1.4;
+        buttonWidth /= multiplierW;
+        buttonHeight /= multiplierW;
 
-        menuHeight /= 1.4;
-        menuWidth /= 1.4;
+        menuHeight /= multiplierW;
+        menuWidth /= multiplierW;
         menuDrawingX = deviceWidth - menuWidth;
-        menuDrawingY /= 1.4;
+        menuDrawingY /= multiplierW;
 
         startEasyGameButtonXFromMenu
                 = startHardGameButtonXFromMenu
                 = creditsButtonXFromMenu
                 = aboutAppButtonXFromMenu
                 = quitButtonXFromMenu
-                = menuDrawingX + (int) ((menuOffset / 2) * 1.4);
+                = menuDrawingX + (int) ((menuOffset / 2) * multiplierW);
 
-        startEasyGameButtonYFromMenu = 475;
-        startHardGameButtonYFromMenu = 525;
-        creditsButtonYFromMenu = 575;
-        aboutAppButtonYFromMenu = 625;
-        quitButtonYFromMenu = 675;
+        startEasyGameButtonYFromMenu = mMenuW[0];
+        startHardGameButtonYFromMenu = mMenuW[1];
+        creditsButtonYFromMenu = mMenuW[2];
+        aboutAppButtonYFromMenu = mMenuW[3];
+        quitButtonYFromMenu = mMenuW[4];
 
-        creditsHeight /= 1.4;
-        creditsWidth /= 1.4;
+        creditsHeight /= multiplierW;
+        creditsWidth /= multiplierW;
 
-        aboutGameHeight /= 1.4;
-        aboutGameWidth /= 1.4;
+        aboutGameHeight /= multiplierW;
+        aboutGameWidth /= multiplierW;
 
-        gameOverHeight /= 1.4;
-        gameOverWidth /= 1.4;
+        gameOverHeight /= multiplierW;
+        gameOverWidth /= multiplierW;
         gameOverDrawingX = (deviceWidth / 2) - (gameOverWidth / 2);
         gameOverDrawingY = (deviceHeight / 2) - (gameOverHeight / 2);
 
-        restartButtonXFromGameOver = 180;
-        restartButtonYFromGameOver = 210;
+        restartButtonXFromGameOver = sMenuW[0];
+        restartButtonYFromGameOver = sMenuW[1];
 
-        menuButtonXFromGameOver = 180;
-        menuButtonYFromGameOver = 280;
+        menuButtonXFromGameOver = sMenuW[0];
+        menuButtonYFromGameOver = sMenuW[2];
 
-        quitButtonXFromGameOver = 180;
-        quitButtonYFromGameOver = 350;
+        quitButtonXFromGameOver = sMenuW[0];
+        quitButtonYFromGameOver = sMenuW[3];
 
-        treeSize /= 1.4;
-        vineWidthEnemy /= 1.4;
-        vineHeightEnemy /= 1.4;
-        vineWidth /= 1.4;
-        vineHeight /= 1.4;
-        vineHWidth /= 1.4;
-        vineHHeight /= 1.4;
+        treeSize /= multiplierW;
+        vineWidthEnemy /= multiplierW;
+        vineHeightEnemy /= multiplierW;
+        vineWidth /= multiplierW;
+        vineHeight /= multiplierW;
+        vineHWidth /= multiplierW;
+        vineHHeight /= multiplierW;
 
-        font.getData().setScale(fontScale /= 1.4);
-        fontDrawX /= 1.4;
-        fontDrawY /= 1.4;
+        font.getData().setScale(fontScale /= multiplierW);
+        fontDrawX /= multiplierW;
+        fontDrawY /= multiplierW;
 
-        sideDeathMargin /= 1.4;
-        upDeathMargin /= 1.4;
+        sideDeathMargin /= multiplierW;
+        upDeathMargin /= multiplierW;
 
-        prizeTreeDistanceBetween /= 1.4;
-        treeRectangleOffset /= 1.4;
+        prizeTreeDistanceBetween /= multiplierW;
+        treeRectangleOffset /= multiplierW;
 
-        vineYOffset1 /= 1.4;
-        vineXOffset1 /= 1.4;
-        vineOffsetValue /= 1.4;
-        menuOffsetValue /= 1.4;
-        treeOffsetValue /= 1.4;
+        vineYOffset1 /= multiplierW;
+        vineXOffset1 /= multiplierW;
+        vineOffsetValue /= multiplierW;
+        menuOffsetValue /= multiplierW;
+        treeOffsetValue /= multiplierW;
 
-        vineSpeedMultiplier = 9;
-        treeSpeedMultiplier = 9;
-        powerBallSpeedMultiplier = 9;
+        vineSpeedMultiplier = speedW;
+        treeSpeedMultiplier = speedW;
+        powerBallSpeedMultiplier = speedW;
 
     }
 
-    private void setupW2560Graphics() {
-
-        ballsToHeight = 4;
-        ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
-        ballPositionX = (deviceWidth * 1.0 / 2) - (ballSize * 1.0 / 2);
-
-        tileSize *= 1.5;
-        ballSize *= 1.5;
-
-        buttonWidth *= 1.5;
-        buttonHeight *= 1.5;
-
-        menuHeight *= 1.5;
-        menuWidth *= 1.5;
-        menuDrawingX = deviceWidth - menuWidth;
-        menuDrawingY *= 1.5;
-
-        startEasyGameButtonXFromMenu
-                = startHardGameButtonXFromMenu
-                = creditsButtonXFromMenu
-                = aboutAppButtonXFromMenu
-                = quitButtonXFromMenu
-                = menuDrawingX + (int) (menuOffset * 1.5);
-
-        startEasyGameButtonYFromMenu = 925;
-        startHardGameButtonYFromMenu = 1030;
-        creditsButtonYFromMenu = 1135;
-        aboutAppButtonYFromMenu = 1240;
-        quitButtonYFromMenu = 1345;
-
-        creditsHeight *= 1.5;
-        creditsWidth *= 1.5;
-
-        aboutGameHeight *= 1.5;
-        aboutGameWidth *= 1.5;
-
-        gameOverHeight *= 1.5;
-        gameOverWidth *= 1.5;
-        gameOverDrawingX = (deviceWidth / 2) - (gameOverWidth / 2);
-        gameOverDrawingY = (deviceHeight / 2) - (gameOverHeight / 2);
-
-        restartButtonXFromGameOver = 370;
-        restartButtonYFromGameOver = 460;
-
-        menuButtonXFromGameOver = 370;
-        menuButtonYFromGameOver = 590;
-
-        quitButtonXFromGameOver = 370;
-        quitButtonYFromGameOver = 730;
-
-        treeSize *= 1.5;
-        vineWidthEnemy *= 1.5;
-        vineHeightEnemy *= 1.5;
-        vineWidth *= 1.5;
-        vineHeight *= 1.5;
-        vineHWidth *= 1.5;
-        vineHHeight *= 1.5;
-
-        font.getData().setScale(fontScale *= 1.5);
-        fontDrawX *= 1.5;
-        fontDrawY *= 1.5;
-
-        sideDeathMargin *= 1.5;
-        upDeathMargin *= 1.5;
-
-        prizeTreeDistanceBetween *= 1.5;
-        treeRectangleOffset *= 1.5;
-
-        vineYOffset1 *= 1.5;
-        vineXOffset1 *= 1.5;
-        vineOffsetValue *= 1.5;
-        menuOffsetValue *= 1.5;
-        treeOffsetValue *= 1.5;
-
-        vineSpeedMultiplier = 8;
-        treeSpeedMultiplier = 8;
-        powerBallSpeedMultiplier = 8;
-    }
-
-    private void setupW1920Graphics() {
+    private void setupGraphics() {
 
         /*
             Main resolution
@@ -535,165 +464,6 @@ public class BallieRun extends ApplicationAdapter {
         creditsButtonYFromMenu = Gdx.graphics.getHeight() - creditsButtonYFromMenu;
         aboutAppButtonYFromMenu = Gdx.graphics.getHeight() - aboutAppButtonYFromMenu;
         quitButtonYFromMenu = Gdx.graphics.getHeight() - quitButtonYFromMenu;
-
-    }
-
-    private void setupW1280Graphics() {
-
-        ballsToHeight = 4;
-        ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
-        ballPositionX = (deviceWidth * 1.0 / 2) - (ballSize * 1.0 / 2);
-
-        tileSize /= 1.5;
-        ballSize /= 1.5;
-
-        buttonWidth /= 1.5;
-        buttonHeight /= 1.5;
-
-        menuHeight /= 1.5;
-        menuWidth /= 1.5;
-        menuDrawingX = deviceWidth - menuWidth;
-        menuDrawingY /= 1.5;
-
-        startEasyGameButtonXFromMenu
-                = startHardGameButtonXFromMenu
-                = creditsButtonXFromMenu
-                = aboutAppButtonXFromMenu
-                = quitButtonXFromMenu
-                = menuDrawingX + (int) ((menuOffset / 2) * 1.5);
-
-        startEasyGameButtonYFromMenu = 490;
-        startHardGameButtonYFromMenu = 540;
-        creditsButtonYFromMenu = 585;
-        aboutAppButtonYFromMenu = 630;
-        quitButtonYFromMenu = 680;
-
-        creditsHeight /= 1.5;
-        creditsWidth /= 1.5;
-
-        aboutGameHeight /= 1.5;
-        aboutGameWidth /= 1.5;
-
-        gameOverHeight /= 1.5;
-        gameOverWidth /= 1.5;
-        gameOverDrawingX = (deviceWidth / 2) - (gameOverWidth / 2);
-        gameOverDrawingY = (deviceHeight / 2) - (gameOverHeight / 2);
-
-        restartButtonXFromGameOver = 165;
-        restartButtonYFromGameOver = 200;
-
-        menuButtonXFromGameOver = 165;
-        menuButtonYFromGameOver = 260;
-
-        quitButtonXFromGameOver = 165;
-        quitButtonYFromGameOver = 325;
-
-        treeSize /= 1.5;
-        vineWidthEnemy /= 1.5;
-        vineHeightEnemy /= 1.5;
-        vineWidth /= 1.5;
-        vineHeight /= 1.5;
-        vineHWidth /= 1.5;
-        vineHHeight /= 1.5;
-
-        font.getData().setScale(fontScale /= 1.5);
-        fontDrawX /= 1.5;
-        fontDrawY /= 1.5;
-
-        sideDeathMargin /= 1.5;
-        upDeathMargin /= 1.5;
-
-        prizeTreeDistanceBetween /= 1.5;
-        treeRectangleOffset /= 1.5;
-
-        vineYOffset1 /= 1.5;
-        vineXOffset1 /= 1.5;
-        vineOffsetValue /= 1.5;
-        menuOffsetValue /= 1.5;
-        treeOffsetValue /= 1.5;
-
-        vineSpeedMultiplier = 8;
-        treeSpeedMultiplier = 8;
-        powerBallSpeedMultiplier = 8;
-    }
-
-    private void setupW800Graphics() {
-
-        ballsToHeight = 4;
-        ballPositionY = (tileSize * 1.0) + (ballSize * ballsToHeight);
-        ballPositionX = (deviceWidth * 1.0 / 2) - (ballSize * 1.0 / 2);
-
-        tileSize /= 2;
-        ballSize /= 2;
-
-        buttonWidth /= 2;
-        buttonHeight /= 2;
-
-        menuHeight /= 2;
-        menuWidth /= 2;
-        menuDrawingX = deviceWidth - menuWidth;
-        menuDrawingY /= 2;
-
-        startEasyGameButtonXFromMenu
-                = startHardGameButtonXFromMenu
-                = creditsButtonXFromMenu
-                = aboutAppButtonXFromMenu
-                = quitButtonXFromMenu
-                = menuDrawingX + (menuOffset / 2);
-
-        startEasyGameButtonYFromMenu = 310;
-        startHardGameButtonYFromMenu = 345;
-        creditsButtonYFromMenu = 380;
-        aboutAppButtonYFromMenu = 415;
-        quitButtonYFromMenu = 450;
-
-        creditsHeight /= 2;
-        creditsWidth /= 2;
-
-        aboutGameHeight /= 2;
-        aboutGameWidth /= 2;
-
-        gameOverHeight /= 2;
-        gameOverWidth /= 2;
-        gameOverDrawingX = (deviceWidth / 2) - (gameOverWidth / 2);
-        gameOverDrawingY = (deviceHeight / 2) - (gameOverHeight / 2);
-
-        restartButtonXFromGameOver = 130;
-        restartButtonYFromGameOver = 150;
-
-        menuButtonXFromGameOver = 130;
-        menuButtonYFromGameOver = 195;
-
-        quitButtonXFromGameOver = 130;
-        quitButtonYFromGameOver = 245;
-
-        treeSize /= 2;
-        vineWidthEnemy /= 2;
-        vineHeightEnemy /= 2;
-        vineWidth /= 2;
-        vineHeight /= 2;
-        vineHWidth /= 2;
-        vineHHeight /= 2;
-
-        font.getData().setScale(fontScale /= 2);
-        fontDrawX /= 2;
-        fontDrawY /= 2;
-
-        sideDeathMargin /= 2;
-        upDeathMargin /= 2;
-
-        prizeTreeDistanceBetween /= 2;
-        treeRectangleOffset /= 2;
-
-        vineYOffset1 /= 2;
-        vineXOffset1 /= 2;
-        vineOffsetValue /= 2;
-        menuOffsetValue /= 2;
-        treeOffsetValue /= 2;
-
-        vineSpeedMultiplier = 8;
-        treeSpeedMultiplier = 8;
-        powerBallSpeedMultiplier = 8;
 
     }
 
