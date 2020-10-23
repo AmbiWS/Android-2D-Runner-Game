@@ -517,6 +517,7 @@ public class BallieRun extends ApplicationAdapter {
             Main resolution
          */
 
+        menuDrawingX = deviceWidth - menuWidth;
         startEasyGameButtonXFromMenu
                 = startHardGameButtonXFromMenu
                 = creditsButtonXFromMenu
