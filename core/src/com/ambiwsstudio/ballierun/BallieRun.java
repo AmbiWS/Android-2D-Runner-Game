@@ -44,11 +44,15 @@ public class BallieRun extends ApplicationAdapter {
     private Rectangle ballRectangle = new Rectangle();
     private Rectangle treeRectangle = new Rectangle();
     private Rectangle powerBallRectangle = new Rectangle();
+    private Rectangle leftMenuWall;
+    private Rectangle upMenuCeil;
     private ArrayList<VineEnemy> vineEnemies = new ArrayList<>();
     private Music forest;
     private Music ballSound;
     private Timer timer;
+    private Timer.Task task;
     private Preferences prefs;
+    private BallieRun instance;
 
     /*
         Sizes & Points (Initialized for main 1920W resolution)
@@ -139,9 +143,9 @@ public class BallieRun extends ApplicationAdapter {
             pointerDiffX = 0,
             pointerDiffY = 0;
 
-    private static final int maxScoreToWinEasyMode = 20000;
-    private static final int maxScoreToWinHardMode = 30000;
-    private static final int scoreToSpeedDivider = 10000;
+    private final int maxScoreToWinEasyMode = 20000;
+    private final int maxScoreToWinHardMode = 30000;
+    private final int scoreToSpeedDivider = 10000;
 
     private final double gravity = 9.8;
     private final double velocityMultiplierConstant = 0.14;
@@ -179,7 +183,7 @@ public class BallieRun extends ApplicationAdapter {
     private int menuOffset = 50;
     private String powerBallTip = "";
 
-    private static class VineEnemy {
+    private class VineEnemy {
 
         Rectangle vineRectangle;
         double drawableXEnvironment = 0;
@@ -202,6 +206,7 @@ public class BallieRun extends ApplicationAdapter {
     private boolean isTreeDamaged = false;
     private boolean isVinePreviouslyGenerated = false;
     private boolean isPowerBallTileActive = false;
+    private boolean isNeedToClose = false;
 
     private void resetGameCommonVariables() {
 
@@ -247,6 +252,8 @@ public class BallieRun extends ApplicationAdapter {
         speed = 0.5;
         vineGeneratorLockTilesCount = 0;
 
+        for (int i = 0; i < vineEnemies.size(); i++)
+            vineEnemies.get(i).vineRectangle = null;
         vineEnemies.clear();
 
         isEnvironmentLifeTileActive = false;
@@ -258,6 +265,7 @@ public class BallieRun extends ApplicationAdapter {
     @Override
     public void create() {
 
+        instance = this;
         batch = new SpriteBatch();
         background = new Texture("Background.png");
         defaultTile = new Texture("Tile_2.png");
@@ -328,23 +336,35 @@ public class BallieRun extends ApplicationAdapter {
             Adaptive design
          */
 
+        int[] initArrM;
+        int[] initArrS;
+
         if (Gdx.graphics.getWidth() <= 800) {
 
+            initArrM = new int[]{310, 345, 380, 415, 450};
+            initArrS = new int[]{130, 150, 195, 245};
+
             setupGraphics(8, 2,
-                    new int[]{310, 345, 380, 415, 450},
-                    new int[]{130, 150, 195, 245});
+                    initArrM,
+                    initArrS);
 
         } else if (Gdx.graphics.getWidth() <= 1280) {
 
+            initArrM = new int[]{490, 540, 585, 630, 680};
+            initArrS = new int[]{165, 200, 260, 325};
+
             setupGraphics(8, 1.5,
-                    new int[]{490, 540, 585, 630, 680},
-                    new int[]{165, 200, 260, 325});
+                    initArrM,
+                    initArrS);
 
         } else if (Gdx.graphics.getWidth() <= 1520) {
 
+            initArrM = new int[]{475, 525, 575, 625, 675};
+            initArrS = new int[]{180, 210, 280, 350};
+
             setupGraphics(9, 1.4,
-                    new int[]{475, 525, 575, 625, 675},
-                    new int[]{180, 210, 280, 350});
+                    initArrM,
+                    initArrS);
 
         } else if (Gdx.graphics.getWidth() <= 1920) {
 
@@ -352,9 +372,12 @@ public class BallieRun extends ApplicationAdapter {
 
         } else if (Gdx.graphics.getWidth() <= 2560) {
 
+            initArrM = new int[]{925, 1030, 1135, 1240, 1375};
+            initArrS = new int[]{370, 460, 590, 730};
+
             setupGraphics(8, 0.6666,
-                    new int[] {925, 1030, 1135, 1240, 1375},
-                    new int[] {370, 460, 590, 730});
+                    initArrM,
+                    initArrS);
 
         } else {
 
@@ -489,7 +512,7 @@ public class BallieRun extends ApplicationAdapter {
             powerBallTip = "Thank You ;)";
             ballMode = 3;
 
-            timer.scheduleTask(new Timer.Task() {
+            task = new Timer.Task() {
                 @Override
                 public void run() {
 
@@ -500,7 +523,9 @@ public class BallieRun extends ApplicationAdapter {
                     timer = new Timer();
 
                 }
-            }, winTimerDelay);
+            };
+
+            timer.scheduleTask(task, winTimerDelay);
 
         }
 
@@ -523,7 +548,7 @@ public class BallieRun extends ApplicationAdapter {
         powerBallTip = "Thank You ;)";
         ballMode = 3;
 
-        timer.scheduleTask(new Timer.Task() {
+        task = new Timer.Task() {
             @Override
             public void run() {
 
@@ -534,7 +559,9 @@ public class BallieRun extends ApplicationAdapter {
                 timer = new Timer();
 
             }
-        }, winTimerDelay);
+        };
+
+        timer.scheduleTask(task, winTimerDelay);
 
     }
 
@@ -720,6 +747,7 @@ public class BallieRun extends ApplicationAdapter {
                     vineEnemies.add(vineEnemy);
                     isVinePreviouslyGenerated = true;
                     vineGeneratorLockTilesCount = 0;
+                    vineEnemy.vineRectangle = null;
 
                 } else if (vineRandom >= 0.8) {
 
@@ -728,6 +756,7 @@ public class BallieRun extends ApplicationAdapter {
                     vineEnemies.add(vineEnemy);
                     isVinePreviouslyGenerated = true;
                     vineGeneratorLockTilesCount = 0;
+                    vineEnemy.vineRectangle = null;
 
                 }
 
@@ -949,7 +978,7 @@ public class BallieRun extends ApplicationAdapter {
 
             if (isBtnClicked(quitButtonXFromGameOver, quitButtonYFromGameOver, gameOverDrawingX, gameOverDrawingY)) {
 
-                Gdx.app.exit();
+                isNeedToClose = true;
 
             }
 
@@ -989,7 +1018,7 @@ public class BallieRun extends ApplicationAdapter {
 
             if (isBtnClicked(quitButtonXFromMenu, quitButtonYFromMenu)) {
 
-                Gdx.app.exit();
+                isNeedToClose = true;
 
             }
 
@@ -1003,6 +1032,9 @@ public class BallieRun extends ApplicationAdapter {
     }
 
     private void renderEnvironment(SpriteBatch batch) {
+
+        if (isNeedToClose)
+            return;
 
         if (gameMode == 2 && score >= maxScoreToWinEasyMode) {
 
@@ -1134,6 +1166,9 @@ public class BallieRun extends ApplicationAdapter {
 
     private void renderBall(SpriteBatch batch) {
 
+        if (isNeedToClose)
+            return;
+
         if (gameMode == 1
                 || gameMode == -1
                 || gameMode == 2) {
@@ -1152,7 +1187,8 @@ public class BallieRun extends ApplicationAdapter {
                         ballMode = 1;
                         isPowerBallTileActive = true;
                         powerBallTip = "[Invincibility]";
-                        timer.scheduleTask(new Timer.Task() {
+
+                        task = new Timer.Task() {
                             @Override
                             public void run() {
 
@@ -1162,13 +1198,16 @@ public class BallieRun extends ApplicationAdapter {
                                 timer = new Timer();
 
                             }
-                        }, powerBallTimer);
+                        };
+
+                        timer.scheduleTask(task, powerBallTimer);
 
                     } else if (currentPowerBall.equals(powerBallT)) {
 
                         ballMode = 2;
                         powerBallTip = "[Tap to teleport]";
-                        timer.scheduleTask(new Timer.Task() {
+
+                        task = new Timer.Task() {
                             @Override
                             public void run() {
 
@@ -1178,7 +1217,9 @@ public class BallieRun extends ApplicationAdapter {
                                 timer = new Timer();
 
                             }
-                        }, powerBallTimer);
+                        };
+
+                        timer.scheduleTask(task, powerBallTimer);
 
                     }
 
@@ -1218,8 +1259,8 @@ public class BallieRun extends ApplicationAdapter {
 
         if (gameMode == -1) {
 
-            Rectangle leftMenuWall = new Rectangle(menuDrawingX, menuDrawingY, 1, menuHeight);
-            Rectangle upMenuCeil = new Rectangle(menuDrawingX + (menuOffsetValue * 4), menuDrawingY + menuHeight + menuOffsetValue, menuWidth, menuOffsetValue);
+            leftMenuWall = new Rectangle(menuDrawingX, menuDrawingY, 1, menuHeight);
+            upMenuCeil = new Rectangle(menuDrawingX + (menuOffsetValue * 4), menuDrawingY + menuHeight + menuOffsetValue, menuWidth, menuOffsetValue);
 
             if (Intersector.overlaps(upMenuCeil, ballRectangle)) {
 
@@ -1299,8 +1340,14 @@ public class BallieRun extends ApplicationAdapter {
 
             }
 
-            if (gameMode == 0)
+            if (gameMode == 0) {
+
+                for (int i = 0; i < vineEnemies.size(); i++)
+                    vineEnemies.get(i).vineRectangle = null;
+
                 vineEnemies.clear();
+
+            }
 
         }
 
@@ -1377,13 +1424,19 @@ public class BallieRun extends ApplicationAdapter {
     @Override
     public void render() {
 
+        if (isNeedToClose) {
+
+            Gdx.app.exit();
+            return;
+
+        }
+
         batch.begin();
 
         renderEnvironment(batch);
         renderBall(batch);
 
         batch.end();
-
     }
 
     @Override
@@ -1404,6 +1457,7 @@ public class BallieRun extends ApplicationAdapter {
         tree.dispose();
         damagedTree.dispose();
         font.dispose();
+        forest.stop();
         forest.dispose();
         powerBallP.dispose();
         powerBallT.dispose();
@@ -1412,8 +1466,31 @@ public class BallieRun extends ApplicationAdapter {
         ballA.dispose();
         ballSkin.dispose();
         prizeTree.dispose();
+        ballSound.stop();
+        ballSound.dispose();
 
-        System.exit(0);
+        powerBallTip = null;
+
+        task = null;
+
+        prefs.clear();
+        prefs = null;
+
+        ballRectangle = null;
+        powerBallRectangle = null;
+        treeRectangle = null;
+        leftMenuWall = null;
+        upMenuCeil = null;
+
+        for (int i = 0; i < vineEnemies.size(); i++)
+            vineEnemies.get(i).vineRectangle = null;
+
+        vineEnemies.clear();
+        vineEnemies = null;
+
+        timer.stop();
+        timer.clear();
+        timer = null;
 
     }
 
