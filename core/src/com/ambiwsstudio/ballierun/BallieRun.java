@@ -52,7 +52,6 @@ public class BallieRun extends ApplicationAdapter {
     private Timer timer;
     private Timer.Task task;
     private Preferences prefs;
-    private BallieRun instance;
 
     /*
         Sizes & Points (Initialized for main 1920W resolution)
@@ -265,7 +264,6 @@ public class BallieRun extends ApplicationAdapter {
     @Override
     public void create() {
 
-        instance = this;
         batch = new SpriteBatch();
         background = new Texture("Background.png");
         defaultTile = new Texture("Tile_2.png");
