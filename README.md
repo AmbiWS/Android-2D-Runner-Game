@@ -7,6 +7,7 @@ Tools: Java, libGDX.
 One of the first pet-projects for Android.  
 A simple runner-like game with uncommon controls for Android OS.  
 Feel free to try it on [Google Play!](https://play.google.com/store/apps/details?id=com.ambiwsstudio.ballierun)  
+Code can be found [here!](https://github.com/AmbiWS/Android-2D-Runner-Game/tree/master/core/src/com/ambiwsstudio/ballierun)  
 Also there can be found more information about app, and other projects to inspect.
 
 ---
